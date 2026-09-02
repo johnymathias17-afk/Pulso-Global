@@ -37,7 +37,33 @@ export default function App() {
   const [articles, setArticles] = useState([])
   const [loading, setLoading] = useState(true)
   const [active, setActive] = useState('todos')
+const [cotacoes, setCotacoes] = useState({})
+const [mercadosAtualizadosEm, setMercadosAtualizadosEm] = useState(null)
+useEffect(() => {
+  async function carregarCotacoes() {
+    const { data, error } = await supabase.functions.invoke('market-quotes')
 
+    if (error) {
+      console.error('Erro ao carregar cotações:', error)
+      return
+    }
+
+    const mapa = Object.fromEntries(
+      (data?.quotes ?? [])
+        .filter(q => q.price != null)
+        .map(q => [q.symbol, q])
+    )
+
+    setCotacoes(mapa)
+    setMercadosAtualizadosEm(new Date())
+  }
+
+  carregarCotacoes()
+
+  const timer = setInterval(carregarCotacoes, 60000)
+
+  return () => clearInterval(timer)
+}, [])
   useEffect(() => {
     async function carregarNoticias() {
       const { data, error } = await supabase
@@ -267,11 +293,19 @@ export default function App() {
                 </div>
 
                 <strong style={styles.valor}>
-                  —
+                  {cotacoes[simbolo]?.price != null
+  ? (simbolo === 'USD/BRL' ? 'R$ ' : simbolo === 'IBOV' ? '' : 'US$ ') +
+    Number(cotacoes[simbolo].price).toLocaleString('pt-BR', {
+      minimumFractionDigits: simbolo === 'IBOV' ? 0 : 2,
+      maximumFractionDigits: simbolo === 'IBOV' ? 0 : 2
+    })
+  : '—'}
                 </strong>
 
                 <small style={styles.semDados}>
-                  aguardando dados
+                {cotacoes[simbolo]?.changePct != null
+  ? `${cotacoes[simbolo].changePct >= 0 ? '+' : ''}${Number(cotacoes[simbolo].changePct).toFixed(2)}%`
+  : 'aguardando dados'}
                 </small>
               </button>
             ))}
