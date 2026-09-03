@@ -101,7 +101,19 @@ useEffect(() => {
       }
       return
     }
+const { error: emailError } = await supabase.functions.invoke(
+  'send-welcome-email',
+  {
+    body: {
+      email,
+      name: nome
+    }
+  }
+)
 
+if (emailError) {
+  console.error('Erro ao enviar e-mail:', emailError)
+}
     setNewsletterNome('')
     setNewsletterEmail('')
     setNewsletterStatus('Cadastro realizado! Você receberá o Pulso Global. 🚀')
