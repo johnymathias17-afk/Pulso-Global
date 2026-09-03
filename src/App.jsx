@@ -39,6 +39,10 @@ export default function App() {
   const [active, setActive] = useState('todos')
 const [cotacoes, setCotacoes] = useState({})
 const [mercadosAtualizadosEm, setMercadosAtualizadosEm] = useState(null)
+    const [newsletterNome, setNewsletterNome] = useState('')
+  const [newsletterEmail, setNewsletterEmail] = useState('')
+  const [newsletterStatus, setNewsletterStatus] = useState('')
+  const [newsletterLoading, setNewsletterLoading] = useState(false)
 useEffect(() => {
   async function carregarCotacoes() {
     const { data, error } = await supabase.functions.invoke('market-quotes')
@@ -64,6 +68,44 @@ useEffect(() => {
 
   return () => clearInterval(timer)
 }, [])
+  async function inscreverNewsletter(e) {
+    e.preventDefault()
+
+    const email = newsletterEmail.trim().toLowerCase()
+    const nome = newsletterNome.trim()
+
+    if (!email || !email.includes('@')) {
+      setNewsletterStatus('Digite um e-mail válido.')
+      return
+    }
+
+    setNewsletterLoading(true)
+    setNewsletterStatus('')
+
+    const { error } = await supabase
+      .from('newsletter_subscribers')
+      .insert({
+        email,
+        name: nome || null,
+        source: 'website'
+      })
+
+    setNewsletterLoading(false)
+
+    if (error) {
+      if (error.code === '23505') {
+        setNewsletterStatus('Este e-mail já está cadastrado. 👍')
+      } else {
+        console.error(error)
+        setNewsletterStatus('Não foi possível concluir agora. Tente novamente.')
+      }
+      return
+    }
+
+    setNewsletterNome('')
+    setNewsletterEmail('')
+    setNewsletterStatus('Cadastro realizado! Você receberá o Pulso Global. 🚀')
+  }
   useEffect(() => {
     async function carregarNoticias() {
       const { data, error } = await supabase
@@ -382,7 +424,62 @@ useEffect(() => {
           />
 
         </section>
+        <section
+          style={{
+            maxWidth: '1250px',
+            margin: '40px auto',
+            padding: '32px',
+            borderRadius: '20px',
+            background: '#111827',
+            border: '1px solid #263244'
+          }}
+        >
+          <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
+            <div style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '1.5px', color: '#52bcff' }}>
+              PULSO GLOBAL • GRATUITO
+            </div>
 
+            <h2 style={{ fontSize: '28px', margin: '10px 0' }}>
+              Receba o Pulso do Mercado
+            </h2>
+
+            <p style={{ color: '#93a7bb', lineHeight: '1.6' }}>
+              Notícias que realmente importam, mercados, cripto e economia direto no seu celular.
+            </p>
+
+            <form onSubmit={inscreverNewsletter} style={{ display: 'grid', gap: '10px', marginTop: '20px' }}>
+              <input
+                value={newsletterNome}
+                onChange={(e) => setNewsletterNome(e.target.value)}
+                placeholder="Seu nome"
+                style={{ padding: '14px', borderRadius: '10px', border: '1px solid #344054', background: '#0b1220', color: '#fff' }}
+              />
+
+              <input
+                type="email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                placeholder="Seu melhor e-mail"
+                required
+                style={{ padding: '14px', borderRadius: '10px', border: '1px solid #344054', background: '#0b1220', color: '#fff' }}
+              />
+
+              <button
+                type="submit"
+                disabled={newsletterLoading}
+                style={{ padding: '14px', borderRadius: '10px', border: '0', cursor: 'pointer', fontWeight: '800' }}
+              >
+                {newsletterLoading ? 'Enviando...' : 'Quero receber o Pulso'}
+              </button>
+
+              {newsletterStatus && (
+                <small style={{ color: '#93a7bb', marginTop: '5px' }}>
+                  {newsletterStatus}
+                </small>
+              )}
+            </form>
+          </div>
+        </section>
       </main>
 
       <footer style={styles.footer}>
