@@ -193,7 +193,7 @@ if (emailError) {
           onClick={() => navegar('todos')}
         >
           ● PULSO AGORA
-        </button>
+                  </button>
       </header>
 
       <nav style={styles.menu}>
