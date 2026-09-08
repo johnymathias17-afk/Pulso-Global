@@ -116,7 +116,7 @@ if (emailError) {
 }
     setNewsletterNome('')
     setNewsletterEmail('')
-    setNewsletterStatus('Cadastro realizado! Você receberá o Pulso Global. 🚀')
+    setNewsletterStatus('Cadastro realizado! Você receberá o Vetor Global. 🚀')
   }
   useEffect(() => {
     async function carregarNoticias() {
@@ -181,7 +181,7 @@ if (emailError) {
           <div style={styles.logo}>P</div>
 
           <div>
-            <div style={styles.logoNome}>Pulso Global</div>
+            <div style={styles.logoNome}>Vetor Global</div>
             <div style={styles.logoSub}>
               Informação que move decisões.
             </div>
@@ -218,7 +218,7 @@ if (emailError) {
 
           <div style={styles.heroTexto}>
             <div style={styles.eyebrow}>
-              PULSO GLOBAL • AGORA
+              Vetor Global • AGORA
             </div>
 
             <h1 style={styles.titulo}>
@@ -269,13 +269,13 @@ if (emailError) {
 
             <p style={styles.destaqueTexto}>
               {destaque?.summary ||
-                'O Pulso Global está preparado para organizar automaticamente as notícias mais relevantes.'}
+                'O Vetor Global está preparado para organizar automaticamente as notícias mais relevantes.'}
             </p>
 
             {destaque && (
               <>
                 <small style={styles.meta}>
-                  {destaque.source?.name || 'Pulso Global'}
+                  {destaque.source?.name || 'Vetor Global'}
                   {' • '}
                   {dataFormatada(
                     destaque.published_at ||
@@ -383,7 +383,7 @@ if (emailError) {
 
           {loading ? (
             <div style={styles.vazio}>
-              Carregando o Pulso Global...
+              Carregando o Vetor Global...
             </div>
           ) : !destaque ? (
             <div style={styles.vazio}>
@@ -448,7 +448,7 @@ if (emailError) {
         >
           <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
             <div style={{ fontSize: '12px', fontWeight: '800', letterSpacing: '1.5px', color: '#52bcff' }}>
-              PULSO GLOBAL • GRATUITO
+              Vetor Global • GRATUITO
             </div>
 
             <h2 style={{ fontSize: '28px', margin: '10px 0' }}>
@@ -495,7 +495,7 @@ if (emailError) {
       </main>
 
       <footer style={styles.footer}>
-        <strong>Pulso Global</strong>
+        <strong>Vetor Global</strong>
         <span>
           Notícias • Mercados • Cripto • Mundo
         </span>
