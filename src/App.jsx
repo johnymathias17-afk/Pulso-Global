@@ -190,7 +190,7 @@ if (emailError) {
 
         <button
           style={styles.pulsoButton}
-          onClick={() => navegar('todos')}
+          onClick={() => document.getElementById('pulso-agora')?.scrollIntoView({ behavior: 'smooth' })}
         >
           ● PULSO AGORA
                   </button>
@@ -367,7 +367,7 @@ if (emailError) {
           </div>
         </section>
 
-        <section style={styles.section}>
+        <section id="pulso-agora" style={styles.section}>
 
           <div style={styles.sectionTopo}>
             <div>
