@@ -190,7 +190,7 @@ if (emailError) {
 
         <button
           style={styles.pulsoButton}
-          onClick={() => navegar('mercados')}
+          onClick={() => navegar('todos')}
         >
           ● PULSO AGORA
         </button>
