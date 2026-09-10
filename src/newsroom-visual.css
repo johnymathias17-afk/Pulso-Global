@@ -1,0 +1,67 @@
+/* Vetor Global — visual newsroom layer */
+.vetor-editorial-signal {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: #f2f4f7;
+  color: #667085;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .7px;
+  vertical-align: middle;
+}
+
+.vetor-high-relevance {
+  border-color: #b8c9e8 !important;
+  box-shadow: 0 8px 24px rgba(16,24,40,.06) !important;
+}
+
+.vetor-high-relevance .vetor-editorial-signal {
+  background: #eef4ff;
+  color: #155eef;
+}
+
+.vetor-has-image {
+  overflow: hidden;
+}
+
+.vetor-has-image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #eef2f6;
+}
+
+#pulso-agora .noticiasGrid article:first-child {
+  border-top: 3px solid #155eef !important;
+}
+
+#pulso-agora .noticiasGrid article:first-child .vetor-editorial-signal {
+  background: #155eef;
+  color: #fff;
+}
+
+@media (min-width: 721px) {
+  #pulso-agora .noticiasGrid article:first-child {
+    grid-column: span 2;
+  }
+
+  #pulso-agora .noticiasGrid article:first-child img {
+    aspect-ratio: 21 / 9;
+  }
+}
+
+@media (max-width: 720px) {
+  .vetor-editorial-signal {
+    font-size: 8px;
+    padding: 2px 5px;
+  }
+
+  .vetor-has-image img {
+    aspect-ratio: 16 / 9;
+    margin: -16px -16px 14px;
+    width: calc(100% + 32px);
+  }
+}
