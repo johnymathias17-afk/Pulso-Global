@@ -1,0 +1,52 @@
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL
+const SUPABASE_KEY = process.env.VITE_SUPABASE_PUBLISHABLE_KEY
+
+function esc(value = '') {
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;')
+}
+
+function jsonLd(value) {
+  return JSON.stringify(value).replace(/</g, '\\u003c')
+}
+
+export default async function handler(req, res) {
+  const id = req.query?.id
+  if (!id || !SUPABASE_URL || !SUPABASE_KEY) return res.status(404).send('Notícia não encontrada')
+
+  try {
+    const endpoint = `${SUPABASE_URL}/rest/v1/articles?select=id,title,summary,url,image_url,published_at,created_at,category:categories(name,slug),source:sources(name)&id=eq.${encodeURIComponent(id)}&limit=1`
+    const response = await fetch(endpoint, { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } })
+    const rows = response.ok ? await response.json() : []
+    const article = rows?.[0]
+    if (!article) return res.status(404).send('Notícia não encontrada')
+
+    const title = article.title || 'Notícia'
+    const description = article.summary || 'Notícia → contexto → impacto.'
+    const published = article.published_at || article.created_at || new Date().toISOString()
+    const canonical = `https://vetorglobal.com.br/noticia/${encodeURIComponent(article.id)}`
+    const image = article.image_url || 'https://vetorglobal.com.br/og-image.png'
+    const source = article.source?.name || 'Vetor Global'
+    const schema = {
+      '@context': 'https://schema.org',
+      '@type': 'NewsArticle',
+      headline: title,
+      description,
+      datePublished: published,
+      dateModified: published,
+      mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+      image: [image],
+      author: { '@type': 'Organization', name: 'Vetor Global', url: 'https://vetorglobal.com.br/' },
+      publisher: { '@type': 'Organization', name: 'Vetor Global', url: 'https://vetorglobal.com.br/' },
+      isAccessibleForFree: true,
+      articleSection: article.category?.name || 'Notícias',
+      citation: article.url || undefined,
+    }
+
+    const html = `<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"><link rel="canonical" href="${canonical}"><meta name="description" content="${esc(description)}"><meta property="og:type" content="article"><meta property="og:site_name" content="Vetor Global"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${esc(image)}"><meta property="article:published_time" content="${esc(published)}"><title>${esc(title)} — Vetor Global</title><script type="application/ld+json">${jsonLd(schema)}</script><style>body{margin:0;background:#f7f8fa;color:#101828;font-family:Arial,Helvetica,sans-serif}.wrap{max-width:820px;margin:0 auto;padding:28px 20px 64px}.brand{font-weight:800;color:#155eef;text-decoration:none}.crumb{margin-top:38px;color:#667085;font-size:13px}.tag{margin-top:22px;color:#155eef;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px}.title{font-family:Georgia,serif;font-size:clamp(34px,6vw,60px);line-height:1.05;letter-spacing:-1px;margin:10px 0 18px}.summary{font-size:19px;line-height:1.6;color:#475467}.meta{margin-top:18px;color:#667085;font-size:13px}.image{display:block;width:100%;max-height:520px;object-fit:cover;border-radius:16px;margin:28px 0}.source{color:#667085;font-size:13px}.original{display:inline-block;margin-top:24px;background:#155eef;color:#fff;text-decoration:none;padding:12px 16px;border-radius:8px;font-weight:800}.back{display:inline-block;margin-top:18px;color:#155eef;text-decoration:none;font-weight:700}</style></head><body><main class="wrap"><a class="brand" href="https://vetorglobal.com.br/">Vetor Global</a><div class="crumb">Notícia → contexto → impacto</div><div class="tag">${esc(article.category?.name || 'Notícia')}</div><h1 class="title">${esc(title)}</h1><p class="summary">${esc(description)}</p><div class="meta">${esc(source)} • ${new Intl.DateTimeFormat('pt-BR',{dateStyle:'medium',timeStyle:'short'}).format(new Date(published))}</div>${article.image_url ? `<img class="image" src="${esc(article.image_url)}" alt="${esc(title)}">` : ''}<p class="source">Fonte original: ${esc(source)}</p>${article.url ? `<a class="original" href="${esc(article.url)}" target="_blank" rel="noopener noreferrer">Ler notícia original ↗</a>` : ''}<br><a class="back" href="https://vetorglobal.com.br/">← Voltar ao Vetor Global</a></main></body></html>`
+    res.setHeader('Content-Type', 'text/html; charset=utf-8')
+    res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=1800')
+    return res.status(200).send(html)
+  } catch (error) {
+    return res.status(404).send('Notícia não encontrada')
+  }
+}
