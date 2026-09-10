@@ -4,6 +4,8 @@ import App from './App'
 import './styles.css'
 import './premium.css'
 import './editorial.css'
+import './pro-teaser.css'
+import './pro-teaser.js'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode><App /></React.StrictMode>
