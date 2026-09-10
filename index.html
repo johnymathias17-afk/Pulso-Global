@@ -17,6 +17,22 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (() => {
+        const atualizarStatus = () => {
+          const spans = document.querySelectorAll('span');
+          for (const span of spans) {
+            if (span.textContent.trim() === '● EM ATUALIZAÇÃO') {
+              const agora = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+              span.textContent = `● Atualizado às ${agora}`;
+            }
+          }
+        };
+        const observer = new MutationObserver(atualizarStatus);
+        observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+        document.addEventListener('DOMContentLoaded', atualizarStatus);
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
