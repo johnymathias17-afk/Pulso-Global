@@ -14,10 +14,11 @@ article:hover { transform:translateY(-2px); box-shadow:0 12px 30px rgba(11,18,32
 *,*::before,*::after { box-sizing:border-box; }
 img { max-width:100%; }
 
-/* Newsletter: always readable on light surfaces. */
-input[type="text"], input[type="email"], textarea, select { background:#FFFFFF!important; color:#101828!important; -webkit-text-fill-color:#101828!important; border:1px solid #D0D5DD!important; }
-input[type="text"]::placeholder, input[type="email"]::placeholder, textarea::placeholder { color:#667085!important; opacity:1!important; -webkit-text-fill-color:#667085!important; }
-input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focus { background:#FFFFFF!important; color:#101828!important; -webkit-text-fill-color:#101828!important; border-color:#155EEF!important; outline:2px solid rgba(21,94,239,.16)!important; outline-offset:1px; }
+/* Newsletter controls: explicit white surface and dark text. */
+main form input { background:#FFFFFF!important; background-color:#FFFFFF!important; color:#101828!important; -webkit-text-fill-color:#101828!important; border:1px solid #D0D5DD!important; }
+main form input::placeholder { color:#667085!important; opacity:1!important; -webkit-text-fill-color:#667085!important; }
+main form input:focus { background:#FFFFFF!important; background-color:#FFFFFF!important; color:#101828!important; -webkit-text-fill-color:#101828!important; border-color:#155EEF!important; outline:2px solid rgba(21,94,239,.16)!important; outline-offset:1px; }
+main form input[type="checkbox"] { background:transparent!important; background-color:transparent!important; border:0!important; color:initial!important; -webkit-text-fill-color:initial!important; accent-color:#155EEF!important; }
 
 @media (max-width:720px) {
   html,body { width:100%; max-width:100%; overflow-x:hidden!important; }
@@ -27,7 +28,6 @@ input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focu
   nav { width:100%!important; max-width:100%!important; overflow-x:auto!important; scrollbar-width:none; }
   nav::-webkit-scrollbar { display:none; }
 
-  /* One deterministic mobile column for every content grid. */
   main [style*="grid-template-columns"] { grid-template-columns:minmax(0,1fr)!important; width:100%!important; min-width:0!important; }
   main [style*="grid-template-columns"] > * { min-width:0!important; max-width:100%!important; }
   main .noticiasGrid { display:grid!important; grid-template-columns:minmax(0,1fr)!important; gap:12px!important; width:100%!important; min-width:0!important; }
@@ -54,10 +54,10 @@ input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focu
   main > section:first-child > div:last-child { width:100%!important; max-width:100%!important; min-width:0!important; padding:18px!important; }
   main > section:first-child br { display:none!important; }
 
-  /* Newsletter inputs: white field + dark text on every mobile browser. */
-  main input[type="text"], main input[type="email"] { width:100%!important; max-width:100%!important; min-width:0!important; background:#FFFFFF!important; color:#101828!important; -webkit-text-fill-color:#101828!important; border:1px solid #D0D5DD!important; border-radius:14px!important; }
-  main input[type="text"]::placeholder, main input[type="email"]::placeholder { color:#667085!important; opacity:1!important; -webkit-text-fill-color:#667085!important; }
-  main input[type="checkbox"] { accent-color:#155EEF!important; }
+  /* Mobile: no dark inherited surface may override newsletter fields. */
+  main form input { width:100%!important; max-width:100%!important; min-width:0!important; background:#FFFFFF!important; background-color:#FFFFFF!important; color:#101828!important; -webkit-text-fill-color:#101828!important; border:1px solid #D0D5DD!important; border-radius:14px!important; }
+  main form input::placeholder { color:#667085!important; opacity:1!important; -webkit-text-fill-color:#667085!important; }
+  main form input[type="checkbox"] { width:auto!important; min-width:auto!important; background:transparent!important; background-color:transparent!important; border:0!important; accent-color:#155EEF!important; }
 
   footer { flex-direction:column!important; gap:8px!important; }
 }
@@ -71,4 +71,4 @@ input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focu
   #mercados > div:last-child { grid-template-columns:1fr!important; }
 }
 
-@media (prefers-reduced-motion:reduce) { html{scroll-behavior:auto;} *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;} }
+@media (prefers-reduced-motion:reduce) { html{scroll-behavior:auto;} *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;} *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;} }
