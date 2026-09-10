@@ -5,9 +5,8 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
 const client = createClient(supabaseUrl, supabaseKey)
 
-// Market quotes must never be served from an intermediate cache. Keep the
-// normal Supabase client API intact while adding a small retry for transient
-// Edge Function/network failures.
+// Market quotes: use the Supabase Edge Function first, then fall back to the
+// Vercel serverless endpoint if the Edge Function returns an empty/stale set.
 const functionsProxy = new Proxy(client.functions, {
   get(target, property, receiver) {
     if (property !== 'invoke') return Reflect.get(target, property, receiver)
@@ -30,14 +29,43 @@ const functionsProxy = new Proxy(client.functions, {
 
       let result = await target.invoke(functionName, { ...options, body, headers })
 
-      // One controlled retry prevents a temporary Edge Function/network
-      // failure from leaving the dashboard looking frozen for the next minute.
       if (result.error) {
         await new Promise(resolve => setTimeout(resolve, 1200))
-        result = await target.invoke(functionName, { ...options, body: { ...body, _retry: Date.now() }, headers: { ...headers, 'X-Market-Retry': '1' } })
+        result = await target.invoke(functionName, {
+          ...options,
+          body: { ...body, _retry: Date.now() },
+          headers: { ...headers, 'X-Market-Retry': '1' },
+        })
       }
 
-      return result
+      const edgeQuotes = result?.data?.quotes
+      if (!result.error && Array.isArray(edgeQuotes) && edgeQuotes.length > 0) {
+        return result
+      }
+
+      // Fallback is only for market-quotes; all other Edge Functions remain unchanged.
+      try {
+        const fallback = await fetch(`/api/market-quotes?_refresh=${Date.now()}`, {
+          method: 'GET',
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache, no-store, max-age=0' },
+        })
+        if (fallback.ok) {
+          const data = await fallback.json()
+          if (Array.isArray(data?.quotes) && data.quotes.length > 0) {
+            return { data, error: null }
+          }
+        }
+      } catch (fallbackError) {
+        console.error('Fallback de cotações indisponível:', fallbackError)
+      }
+
+      // Important: return an error when there is no real quote data, so the UI
+      // does not falsely display a fresh timestamp for an empty response.
+      return {
+        data: null,
+        error: result?.error || new Error('Nenhuma cotação disponível'),
+      }
     }
   },
 })
