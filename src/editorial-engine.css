@@ -1,3 +1,9 @@
 .vetor-market-stale{color:#667085!important}
 #pulso-agora .noticiasGrid>article[style*="display: none"]{display:none!important}
-@media(max-width:720px){#mercados .atualizacao{font-size:9px;white-space:nowrap}.vetor-editorial-signal{font-size:8px!important}.noticiasGrid>article{min-width:0;overflow:hidden}.noticiasGrid>article h3{overflow-wrap:anywhere}}
+.vetor-contexto{margin:10px 0 0;padding:10px 12px;border-left:3px solid #155eef;background:#f7f9fc;border-radius:0 8px 8px 0;color:#344054;font-size:12px;line-height:1.55}
+.vetor-contexto strong{display:block;margin-bottom:3px;color:#155eef;font-size:9px;letter-spacing:.8px;text-transform:uppercase}
+.vetor-impacto{margin:9px 0 0;color:#101828;font-size:12px;line-height:1.55}
+.vetor-impacto strong{color:#155eef;font-size:9px;letter-spacing:.8px;text-transform:uppercase}
+.vetor-cenario{margin:8px 0 0;color:#475467;font-size:12px;line-height:1.55}
+.vetor-cenario strong{color:#155eef;font-size:9px;letter-spacing:.8px;text-transform:uppercase}
+@media(max-width:720px){#mercados .atualizacao{font-size:9px;white-space:nowrap}.vetor-editorial-signal{font-size:8px!important}.noticiasGrid>article{min-width:0;overflow:hidden}.noticiasGrid>article h3{overflow-wrap:anywhere}.vetor-contexto{font-size:11px;padding:9px 10px}.vetor-impacto,.vetor-cenario{font-size:11px}}
