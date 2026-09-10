@@ -11,6 +11,7 @@ import './pro-teaser.js'
 import './seo-enhancer.js'
 import './editorial-enhancer.js'
 import './editorial-priority.js'
+import './editorial-engine.js'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode><App /></React.StrictMode>
