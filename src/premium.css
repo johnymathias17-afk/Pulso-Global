@@ -17,48 +17,48 @@ img { max-width:100%; }
 @media (max-width:720px) {
   html,body { width:100%; max-width:100%; overflow-x:hidden!important; }
   body { padding:0!important; }
+  #root { width:100%; max-width:100%; overflow-x:hidden!important; }
   header { padding-left:16px!important; padding-right:16px!important; }
   nav { width:100%!important; max-width:100%!important; overflow-x:auto!important; scrollbar-width:none; }
   nav::-webkit-scrollbar { display:none; }
 
-  /* Every content grid becomes a single, aligned mobile column. */
-  main div[style*="grid-template-columns"] { grid-template-columns:minmax(0,1fr)!important; width:100%!important; min-width:0!important; }
-  main div[style*="grid-template-columns"] > * { min-width:0!important; max-width:100%!important; }
-  main div[style*="grid-template-columns"] article { width:100%!important; min-width:0!important; max-width:100%!important; }
+  /* One deterministic mobile column for every content grid. */
+  main [style*="grid-template-columns"] { grid-template-columns:minmax(0,1fr)!important; width:100%!important; min-width:0!important; }
+  main [style*="grid-template-columns"] > * { min-width:0!important; max-width:100%!important; }
+  main .noticiasGrid { display:grid!important; grid-template-columns:minmax(0,1fr)!important; gap:12px!important; width:100%!important; min-width:0!important; }
 
-  article { min-width:0!important; width:100%!important; max-width:100%!important; overflow:hidden!important; }
-  h1 { font-size:clamp(32px,9vw,46px)!important; }
-  h2 { font-size:clamp(25px,7vw,34px)!important; }
-  h3 { font-size:clamp(19px,5.3vw,25px)!important; }
+  main > section { width:100%!important; max-width:100%!important; min-width:0!important; }
+  main > section > div { min-width:0!important; max-width:100%!important; }
 
-  /* News cards: no horizontal drift, consistent internal spacing. */
-  main article { padding:0!important; }
-  main article .cardCorpo { width:100%!important; max-width:100%!important; padding:16px!important; }
+  article { min-width:0!important; width:100%!important; max-width:100%!important; overflow:hidden!important; padding:0!important; }
+  main article .cardCorpo { width:100%!important; max-width:100%!important; min-width:0!important; padding:16px!important; }
   main article img { width:100%!important; max-width:100%!important; height:150px!important; object-fit:cover!important; display:block!important; }
-  main article h3 { width:100%!important; max-width:100%!important; font-size:19px!important; line-height:1.28!important; overflow-wrap:anywhere!important; word-break:normal!important; margin:9px 0 8px!important; }
-  main article p { width:100%!important; max-width:100%!important; font-size:13px!important; line-height:1.55!important; overflow-wrap:anywhere!important; margin:0 0 12px!important; }
+  main article h3 { width:100%!important; max-width:100%!important; min-width:0!important; font-size:19px!important; line-height:1.28!important; overflow-wrap:anywhere!important; word-break:normal!important; margin:9px 0 8px!important; }
+  main article p { width:100%!important; max-width:100%!important; min-width:0!important; font-size:13px!important; line-height:1.55!important; overflow-wrap:anywhere!important; margin:0 0 12px!important; }
   main article small { display:block!important; max-width:100%!important; overflow-wrap:anywhere!important; line-height:1.4!important; }
   main article a { display:inline-flex!important; margin-top:8px!important; align-items:center!important; }
 
-  /* Section headers and category headers cannot push the page sideways. */
-  main > section { width:100%!important; max-width:100%!important; min-width:0!important; }
-  main > section > div:first-child, main > section > div:first-child > * { min-width:0!important; max-width:100%!important; }
   main > section > div:first-child { flex-wrap:wrap!important; }
+  main > section > div:first-child > * { min-width:0!important; max-width:100%!important; }
 
-  /* Market cards */
-  #mercados > div:last-child { grid-template-columns:1fr!important; width:100%!important; min-width:0!important; }
+  #mercados > div:last-child { grid-template-columns:1fr!important; width:100%!important; min-width:0!important; gap:10px!important; }
   #mercados > div:last-child button { width:100%!important; min-width:0!important; grid-template-columns:auto minmax(0,1fr) auto!important; }
 
-  /* Hero */
   main > section:first-child { width:100%!important; max-width:100%!important; padding:30px 0 22px!important; }
   main > section:first-child > div { min-width:0!important; max-width:100%!important; }
   main > section:first-child > div:last-child { width:100%!important; max-width:100%!important; min-width:0!important; padding:18px!important; }
-  main > section:first-child br { display:none; }
-
-  /* Newsletter */
-  main > section:last-of-type form { width:100%!important; max-width:100%!important; }
-  main > section:last-of-type form input, main > section:last-of-type form button { width:100%!important; min-width:0!important; }
+  main > section:first-child br { display:none!important; }
 
   footer { flex-direction:column!important; gap:8px!important; }
 }
+
+@media (max-width:480px) {
+  main { width:100%!important; }
+  main .noticiasGrid { gap:10px!important; }
+  main article .cardCorpo { padding:15px!important; }
+  main article img { height:140px!important; }
+  main article h3 { font-size:18px!important; }
+  #mercados > div:last-child { grid-template-columns:1fr!important; }
+}
+
 @media (prefers-reduced-motion:reduce) { html{scroll-behavior:auto;} *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;} }
