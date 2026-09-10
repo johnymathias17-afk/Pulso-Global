@@ -4,58 +4,38 @@
 
 /* The lead story earns the strongest visual weight. */
 main > section:first-child .destaque,
-main > section:first-child [style*="destaque"] {
-  position: relative;
-}
+main > section:first-child [style*="destaque"] { position: relative; }
 
 /* News cards: stronger scan rhythm and restrained metadata. */
-main article h3 {
-  text-wrap: balance;
-}
-
-main article p {
-  max-width: 68ch;
-}
+main article h3 { text-wrap: balance; }
+main article p { max-width: 68ch; }
 
 /* Editorial signal: the reader should immediately see source + freshness. */
-main article small {
-  color: #667085 !important;
-  font-size: 11px !important;
-  letter-spacing: .01em;
-}
+main article small { color:#667085 !important; font-size:11px !important; letter-spacing:.01em; }
 
 /* Make the primary news stream feel intentionally curated. */
-#pulso-agora .noticiasGrid > article:first-child {
-  border-top: 2px solid #155eef;
-}
-
-/* Avoid the feeling of a dense news dump. */
-#pulso-agora .noticiasGrid {
-  align-items: stretch;
-}
+#pulso-agora .noticiasGrid > article:first-child { border-top:2px solid #155eef; }
+#pulso-agora .noticiasGrid { align-items:stretch; }
 
 /* Category blocks should feel like editorial desks. */
-main > section > div > div:first-child h2 {
-  text-wrap: balance;
+main > section > div > div:first-child h2 { text-wrap:balance; }
+main article a { font-weight:800 !important; }
+
+/* Newsletter: light editorial surface with strong contrast and a clear conversion CTA. */
+main > section:last-of-type { background:#ffffff !important; color:#101828 !important; border:1px solid #e4e7ec !important; box-shadow:0 12px 32px rgba(16,24,40,.06); }
+main > section:last-of-type h2 { color:#101828 !important; }
+main > section:last-of-type p { color:#475467 !important; }
+main > section:last-of-type label { color:#475467 !important; }
+main > section:last-of-type input { border-color:#d0d5dd !important; }
+main > section:last-of-type button { background:#155eef !important; color:#ffffff !important; }
+main > section:last-of-type .privacidade { color:#667085 !important; }
+
+@media (min-width:721px) {
+  #pulso-agora .noticiasGrid { grid-template-columns:repeat(3,minmax(0,1fr)) !important; }
+  #pulso-agora .noticiasGrid > article:first-child { grid-column:span 2; }
 }
 
-/* Clear interaction hierarchy for source links. */
-main article a {
-  font-weight: 800 !important;
-}
-
-@media (min-width: 721px) {
-  #pulso-agora .noticiasGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  }
-
-  #pulso-agora .noticiasGrid > article:first-child {
-    grid-column: span 2;
-  }
-}
-
-@media (max-width: 720px) {
-  #pulso-agora .noticiasGrid > article:first-child {
-    border-top-width: 2px;
-  }
+@media (max-width:720px) {
+  #pulso-agora .noticiasGrid > article:first-child { border-top-width:2px; }
+  main > section:last-of-type { border-radius:14px !important; }
 }
