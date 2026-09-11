@@ -1,14 +1,18 @@
 {
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap.xml" },
-    { "source": "/rss.xml", "destination": "/api/rss.xml" }
+    { "source": "/news-sitemap.xml", "destination": "/api/news-sitemap.xml" },
+    { "source": "/rss.xml", "destination": "/api/rss.xml" },
+    { "source": "/noticia/:id", "destination": "/api/noticia/:id" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
         { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" }
       ]
     }
   ]
