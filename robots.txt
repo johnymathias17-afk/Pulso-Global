@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://vetorglobal.com.br/sitemap.xml
+Sitemap: https://vetorglobal.com.br/news-sitemap.xml
