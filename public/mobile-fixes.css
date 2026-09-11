@@ -1,0 +1,23 @@
+/* Vetor Global — mobile alignment hardening */
+@media (max-width: 720px) {
+  #root { overflow-x: hidden; }
+  header, nav, main, footer { width: 100%; max-width: 100%; }
+  main { overflow-x: hidden; }
+  header { gap: 12px; }
+  header > div:first-child { min-width: 0; }
+  header > div:first-child > div:last-child { min-width: 0; }
+  header button { flex: 0 0 auto; }
+  nav { padding-left: 2px; padding-right: 2px; }
+  main > section { margin-left: 0 !important; margin-right: 0 !important; }
+  main > section > div { max-width: 100%; }
+  article { box-sizing: border-box; }
+  article h3, article p, article small { overflow-wrap: break-word; word-break: normal; }
+  .mercadosGrid, .noticiasGrid { width: 100% !important; }
+  .mercado { box-sizing: border-box; }
+  footer { padding-left: 16px !important; padding-right: 16px !important; text-align: center; }
+}
+@media (max-width: 480px) {
+  header { height: auto !important; min-height: 74px; padding-top: 10px !important; padding-bottom: 10px !important; }
+  header button { padding: 9px 10px !important; font-size: 11px !important; }
+  main > section { overflow: hidden; }
+}
