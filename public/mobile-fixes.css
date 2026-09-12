@@ -1,4 +1,4 @@
-/* Vetor Global — mobile alignment hardening */
+/* Vetor Global — mobile first readability + layout */
 @media (max-width: 720px) {
   #root { overflow-x: hidden; }
   header, nav, main, footer { width: 100%; max-width: 100%; }
@@ -15,9 +15,34 @@
   .mercadosGrid, .noticiasGrid { width: 100% !important; }
   .mercado { box-sizing: border-box; }
   footer { padding-left: 16px !important; padding-right: 16px !important; text-align: center; }
+
+  /* Regra editorial: leitura fácil antes de quantidade */
+  .vg-card-body { padding: 16px 16px 18px !important; }
+  .vg-card h3 { font-size: 22px !important; line-height: 1.18 !important; letter-spacing: -0.25px !important; margin: 7px 0 10px !important; }
+  .vg-card p { font-size: 18px !important; line-height: 1.52 !important; color: #344054 !important; margin: 0 0 13px !important; }
+  .vg-card small { font-size: 13px !important; line-height: 1.4 !important; color: #667085 !important; }
+  .vg-card a { display: inline-block; margin-top: 10px !important; font-size: 15px !important; font-weight: 700 !important; }
+  .vg-lead .vg-card-body { padding: 18px 18px 22px !important; }
+  .vg-lead h3 { font-size: 30px !important; line-height: 1.08 !important; letter-spacing: -0.55px !important; margin: 8px 0 12px !important; }
+  .vg-lead p { font-size: 19px !important; line-height: 1.5 !important; color: #344054 !important; margin-bottom: 14px !important; }
+  .vg-lead small { font-size: 13px !important; }
+  .vg-lead a { display: inline-block; margin-top: 11px !important; font-size: 15px !important; font-weight: 800 !important; }
+  .vg-section-head h2 { font-size: 28px !important; line-height: 1.12 !important; }
+  .vg-section-head { gap: 12px !important; }
+  .vg-category-head h2 { font-size: 25px !important; line-height: 1.15 !important; }
+  .vg-category-head p { font-size: 16px !important; line-height: 1.45 !important; }
+  .vg-category-grid .vg-card h3 { font-size: 21px !important; }
+  .vg-category-grid .vg-card p { font-size: 18px !important; }
+  .vg-agora strong { font-size: 16px !important; }
+  .vg-agora small { font-size: 13px !important; }
+  .eyebrow, .tag { font-size: 12px !important; letter-spacing: .7px !important; }
 }
 @media (max-width: 480px) {
   header { height: auto !important; min-height: 74px; padding-top: 10px !important; padding-bottom: 10px !important; }
   header button { padding: 9px 10px !important; font-size: 11px !important; }
   main > section { overflow: hidden; }
+  .vg-card h3 { font-size: 21px !important; }
+  .vg-card p { font-size: 18px !important; }
+  .vg-lead h3 { font-size: 28px !important; }
+  .vg-lead p { font-size: 18px !important; }
 }
