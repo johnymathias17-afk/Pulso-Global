@@ -3,7 +3,7 @@
     { "source": "/sitemap.xml", "destination": "/api/sitemap.xml" },
     { "source": "/news-sitemap.xml", "destination": "/api/news-sitemap.xml" },
     { "source": "/rss.xml", "destination": "/api/rss.xml" },
-    { "source": "/noticia/:id", "destination": "/api/noticia/:id" },
+    { "source": "/noticia/:id", "destination": "/api/noticia?id=:id" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
