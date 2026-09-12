@@ -1,0 +1,37 @@
+const SUPABASE_URL = 'https://zcoyngtplusdskknjtmi.supabase.co'
+const SUPABASE_KEY = 'sb_publishable_-swenpBIZ3zhJ7FUX0opaw_smnXZlhO'
+
+function esc(v=''){return String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;')}
+function jsonLd(v){return JSON.stringify(v).replace(/</g,'\\u003c')}
+function clean(v=''){return String(v).replace(/<[^>]*>/g,' ').replace(/&nbsp;|\u00a0/gi,' ').replace(/\s+/g,' ').trim()}
+function editorial(title,summary){const t=(`${title} ${summary}`).toLowerCase();let impact='pode alterar expectativas e decisões nos próximos dias.';let topic='economia, decisões e mercados';if(/selic|juros|inflacao|ipca|fed|copom|banco central/.test(t)){impact='pode mexer com juros, crédito, câmbio e ativos financeiros.';topic='juros, crédito, câmbio e ativos financeiros'}else if(/dolar|cambio|ibovespa|bolsa|ouro|petroleo|commod/.test(t)){impact='pode provocar movimentos em preços, bolsas e câmbio.';topic='preços, bolsas, câmbio e commodities'}else if(/bitcoin|btc|ethereum|eth|cripto|crypto|etf/.test(t)){impact='pode aumentar ou reduzir a pressão sobre os criptoativos.';topic='criptoativos e percepção de risco'}else if(/guerra|israel|ira|ucrania|russia|china|trump|otan/.test(t)){impact='pode afetar comércio, commodities, inflação e mercados globais.';topic='comércio, commodities, inflação e mercados globais'}return {context:`Este tema merece acompanhamento porque pode influenciar ${topic}.`,impact,scenario:'O cenário ainda depende dos próximos desdobramentos; observe novas decisões, dados e a reação dos mercados.'}}
+
+export default async function handler(req,res){
+  const rawId = req.query?.id
+  if(!rawId) return res.status(400).send('Identificador da notícia ausente')
+  try{
+    const safeId = String(rawId).replace(/[^a-zA-Z0-9_-]/g,'')
+    if(!safeId) return res.status(400).send('Identificador inválido')
+    const endpoint=`${SUPABASE_URL}/rest/v1/articles?select=id,title,summary,url,image_url,published_at,created_at,category:categories(name,slug),source:sources(name)&id=eq.${encodeURIComponent(safeId)}&limit=1`
+    const response=await fetch(endpoint,{headers:{apikey:SUPABASE_KEY,Authorization:`Bearer ${SUPABASE_KEY}`,Accept:'application/json'}})
+    if(!response.ok) throw new Error(`Supabase HTTP ${response.status}`)
+    const rows=await response.json()
+    const article=rows?.[0]
+    if(!article) return res.status(404).send('Notícia não encontrada')
+    const title=clean(article.title)||'Notícia'
+    const description=clean(article.summary)||'Notícia → contexto → impacto.'
+    const published=article.published_at||article.created_at||new Date().toISOString()
+    const canonical=`https://vetorglobal.com.br/noticia/${encodeURIComponent(article.id)}`
+    const image=article.image_url||'https://vetorglobal.com.br/og-image.png'
+    const source=clean(article.source?.name)||'Fonte não informada'
+    const ed=editorial(title,description)
+    const schema={'@context':'https://schema.org','@type':'NewsArticle',headline:title,description,datePublished:published,dateModified:published,mainEntityOfPage:{'@type':'WebPage','@id':canonical},image:[image],author:{'@type':'Organization',name:'Vetor Global',url:'https://vetorglobal.com.br/'},publisher:{'@type':'Organization',name:'Vetor Global',url:'https://vetorglobal.com.br/'},isAccessibleForFree:true,articleSection:article.category?.name||'Notícias',citation:article.url||undefined}
+    const html=`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1"><link rel="canonical" href="${canonical}"><meta name="description" content="${esc(description)}"><meta property="og:type" content="article"><meta property="og:site_name" content="Vetor Global"><meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${canonical}"><meta property="og:image" content="${esc(image)}"><meta property="article:published_time" content="${esc(published)}"><title>${esc(title)} — Vetor Global</title><script type="application/ld+json">${jsonLd(schema)}</script><style>body{margin:0;background:#f7f8fa;color:#101828;font-family:Arial,Helvetica,sans-serif}.wrap{max-width:820px;margin:0 auto;padding:28px 20px 64px}.brand{font-weight:800;color:#155eef;text-decoration:none}.crumb{margin-top:38px;color:#667085;font-size:13px}.tag{margin-top:22px;color:#155eef;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px}.title{font-family:Georgia,serif;font-size:clamp(34px,6vw,60px);line-height:1.05;letter-spacing:-1px;margin:10px 0 18px}.summary{font-size:19px;line-height:1.6;color:#344054}.meta{margin-top:18px;color:#475467;font-size:13px}.image{display:block;width:100%;max-height:520px;object-fit:cover;border-radius:16px;margin:28px 0}.source{color:#475467;font-size:13px}.editorial{margin-top:22px;padding:18px;border:1px solid #e4e7ec;border-radius:14px;background:#fff}.editorial h2{font:800 12px Arial,sans-serif;color:#155eef;text-transform:uppercase;letter-spacing:1px;margin:0 0 6px}.editorial p{font-size:15px;line-height:1.6;margin:0 0 16px}.note{font-size:11px!important;color:#667085!important;margin-top:4px!important}.original{display:inline-block;margin-top:24px;background:#155eef;color:#fff;text-decoration:none;padding:12px 16px;border-radius:8px;font-weight:800}.back{display:inline-block;margin-top:18px;color:#155eef;text-decoration:none;font-weight:700}</style></head><body><main class="wrap"><a class="brand" href="https://vetorglobal.com.br/">Vetor Global</a><div class="crumb">Notícia → contexto → impacto → cenário</div><div class="tag">${esc(article.category?.name||'Notícia')}</div><h1 class="title">${esc(title)}</h1><p class="summary">${esc(description)}</p><div class="meta">${esc(source)} • ${new Intl.DateTimeFormat('pt-BR',{dateStyle:'medium',timeStyle:'short'}).format(new Date(published))}</div>${article.image_url?`<img class="image" src="${esc(article.image_url)}" alt="${esc(title)}">`:''}<section class="editorial"><h2>Contexto</h2><p>${esc(ed.context)}</p><h2>Por que importa</h2><p>${esc(ed.impact)}</p><h2>O que observar</h2><p>${esc(ed.scenario)}</p><p class="note">Análise editorial automatizada a partir do tema da notícia. Consulte a fonte original para o conteúdo completo.</p></section><p class="source">Fonte original: ${esc(source)}</p>${article.url?`<a class="original" href="${esc(article.url)}" target="_blank" rel="noopener noreferrer">Ler notícia original ↗</a>`:''}<br><a class="back" href="https://vetorglobal.com.br/">← Voltar ao Vetor Global</a></main></body></html>`
+    res.setHeader('Content-Type','text/html; charset=utf-8')
+    res.setHeader('Cache-Control','public, s-maxage=300, stale-while-revalidate=1800')
+    return res.status(200).send(html)
+  }catch(error){
+    console.error('Erro ao carregar notícia:',error)
+    return res.status(500).send('Não foi possível carregar esta notícia agora')
+  }
+}
