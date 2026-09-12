@@ -28,6 +28,16 @@ const newCategory = "function Categoria({ titulo, subtitulo, categoria, articles
 if (!s.includes(oldCategory)) throw new Error('category block not found')
 s = s.replace(oldCategory, newCategory)
 
+// Add stable class hooks so the portal can adapt cleanly to phones without changing the desktop design.
+s = s.replace('<header style={styles.header}>', '<header className="vg-header" style={styles.header}>')
+s = s.replace('<nav style={styles.menu}>', '<nav className="vg-menu" style={styles.menu}>')
+s = s.replace('<section style={styles.hero}>', '<section className="vg-hero" style={styles.hero}>')
+s = s.replace('<div style={styles.mercadosGrid}>', '<div className="vg-markets-grid" style={styles.mercadosGrid}>')
+s = s.replace('<div style={styles.noticiasGrid}>', '<div className="vg-news-grid" style={styles.noticiasGrid}>')
+s = s.replace('<section style={styles.duasColunas}>', '<section className="vg-two-cols" style={styles.duasColunas}>')
+s = s.replace('<section style={styles.newsletter}>', '<section className="vg-newsletter" style={styles.newsletter}>')
+s = s.replace('<main>', '<main className="vg-main">')
+
 // Visual hierarchy: stronger reading contrast while preserving the premium look.
 s = s.replace("logoSub: { color: '#667085'", "logoSub: { color: '#475467'")
 s = s.replace("descricao: { maxWidth: '700px', color: '#475467'", "descricao: { maxWidth: '700px', color: '#344054'")
@@ -36,6 +46,11 @@ s = s.replace("cardTexto: { color: '#475467'", "cardTexto: { color: '#344054'")
 s = s.replace("categoriaSubtitulo: { color: '#667085'", "categoriaSubtitulo: { color: '#475467'")
 s = s.replace("vazio: { background: '#fff', border: '1px solid #e4e7ec', borderRadius: '12px', padding: '28px', color: '#667085'", "vazio: { background: '#fff', border: '1px solid #e4e7ec', borderRadius: '12px', padding: '28px', color: '#475467'")
 
-// Avoid showing a duplicate title in a card summary when the source only repeats the headline.
+// Mobile-first corrections: one-column news, compact market cards, readable type, and less dead space.
+const responsiveStyle = `<style>{\`\n@media (max-width: 760px) {\n  .vg-main { width: 100%; }\n  .vg-header { height: 70px !important; }\n  .vg-header .vg-pulso-button { padding: 9px 10px !important; font-size: 10px !important; }\n  .vg-hero { grid-template-columns: 1fr !important; gap: 14px !important; margin-top: 12px !important; }\n  .vg-hero h1 { font-size: 42px !important; letter-spacing: -1px !important; }\n  .vg-hero p { font-size: 15px !important; line-height: 1.5 !important; }\n  .vg-hero .vg-destaque { min-height: 230px !important; padding: 22px !important; }\n  .vg-markets-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }\n  .vg-markets-grid button { padding: 12px !important; }\n  .vg-news-grid { grid-template-columns: 1fr !important; gap: 12px !important; }\n  .vg-news-grid article { min-width: 0 !important; }\n  .vg-news-grid img { height: 190px !important; }\n  .vg-two-cols { grid-template-columns: 1fr !important; gap: 12px !important; margin-top: 34px !important; }\n  .vg-main > section { margin-top: 34px !important; }\n  .vg-main > section:first-child { margin-top: 12px !important; }\n  .vg-newsletter { margin: 34px auto !important; }\n  .vg-newsletter h2 { font-size: 34px !important; }\n  .vg-menu { padding: 10px 0 !important; gap: 6px !important; }\n  .vg-menu button { padding: 7px 11px !important; font-size: 12px !important; }\n}\n@media (min-width: 761px) {\n  .vg-news-grid article { min-width: 0; }\n}\n\`}</style>`
+if (!s.includes('vg-mobile-style')) {
+  s = s.replace('<main className="vg-main">', `${responsiveStyle}<main className="vg-main">`)
+}
+
 fs.writeFileSync(path, s)
 console.log('Editorial build patch applied')
