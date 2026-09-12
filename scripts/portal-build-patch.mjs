@@ -31,6 +31,7 @@ s = s.replace('Você poderá deixar de receber os e-mails quando quiser.', '1 e-
 
 // Add stable classes and visual hierarchy.
 s = s.replace('<main>', '<main className="vg-main vg-flow-order">')
+s = s.replace('<main className="vg-main">', '<main className="vg-main vg-flow-order">')
 s = s.replace('<section id="pulso-agora" style={styles.section}>', '<section id="pulso-agora" className="vg-latest" style={styles.section}>')
 s = s.replace('<section id="mercados" style={styles.section}>', '<section id="mercados" className="vg-market-section" style={styles.section}>')
 
