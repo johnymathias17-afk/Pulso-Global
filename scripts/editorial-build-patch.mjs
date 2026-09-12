@@ -37,6 +37,8 @@ s = s.replace('<div style={styles.noticiasGrid}>', '<div className="vg-news-grid
 s = s.replace('<section style={styles.duasColunas}>', '<section className="vg-two-cols" style={styles.duasColunas}>')
 s = s.replace('<section style={styles.newsletter}>', '<section className="vg-newsletter" style={styles.newsletter}>')
 s = s.replace('<main>', '<main className="vg-main">')
+s = s.replace('<button style={styles.pulsoButton}', '<button className="vg-pulso-button" style={styles.pulsoButton}')
+s = s.replace('<div style={styles.destaque}>', '<div className="vg-destaque" style={styles.destaque}>')
 
 // Visual hierarchy: stronger reading contrast while preserving the premium look.
 s = s.replace("logoSub: { color: '#667085'", "logoSub: { color: '#475467'")
