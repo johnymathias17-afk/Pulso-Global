@@ -3,6 +3,54 @@
 html, body, #root { width: 100%; max-width: 100%; }
 body { overflow-x: hidden; }
 
+/* Marca: símbolo e nome devem funcionar como um único conjunto */
+.vg-brand {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #101828 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: auto !important;
+  max-width: 100%;
+  min-width: 0;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  text-align: left;
+}
+.vg-logo {
+  flex: 0 0 48px !important;
+  width: 48px !important;
+  height: 48px !important;
+  border-radius: 11px !important;
+  background: #0b1220 url('/vetor-global-logo.svg') center / cover no-repeat !important;
+  color: transparent !important;
+  font-size: 0 !important;
+  overflow: hidden;
+}
+.vg-brand > span:last-child {
+  min-width: 0;
+  display: block;
+}
+.vg-brand strong {
+  display: block;
+  color: #101828 !important;
+  white-space: nowrap;
+  line-height: 1.1;
+}
+.vg-brand small {
+  display: block;
+  color: #667085 !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  margin-top: 4px !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  max-width: none !important;
+}
+
 @media (max-width: 720px) {
   #root { overflow-x: hidden; }
   header, nav, main, footer { width: 100%; max-width: 100%; }
@@ -18,7 +66,6 @@ body { overflow-x: hidden; }
   article h3, article p, article small { overflow-wrap: break-word; word-break: normal; }
   footer { padding-left: 16px !important; padding-right: 16px !important; text-align: center; }
 
-  /* Regra editorial: leitura fácil antes de quantidade */
   .vg-agora { flex-wrap: wrap !important; align-items: center !important; }
   .vg-agora strong { font-size: 16px !important; line-height: 1.25 !important; }
   .vg-agora small { display: none !important; }
@@ -42,7 +89,6 @@ body { overflow-x: hidden; }
   .vg-lead small { font-size: 13px !important; }
   .vg-lead a { display: inline-block; margin-top: 11px !important; font-size: 15px !important; font-weight: 800 !important; }
 
-  /* Cabeçalhos de seção não podem quebrar ou sair da tela */
   .vg-section-head, .vg-category-head { flex-wrap: wrap !important; align-items: flex-start !important; gap: 8px !important; }
   .vg-section-head > div, .vg-category-head > div { min-width: 0; flex: 1 1 220px; }
   .vg-section-head button, .vg-category-head button { margin-left: auto; white-space: nowrap; }
@@ -60,10 +106,14 @@ body { overflow-x: hidden; }
 }
 
 @media (max-width: 480px) {
-  header { height: auto !important; min-height: 74px; padding-top: 10px !important; padding-bottom: 10px !important; }
+  header { height: auto !important; min-height: 74px; padding: 10px 12px !important; }
   header button { padding: 9px 10px !important; font-size: 11px !important; }
+  header .vg-brand { flex: 1 1 auto !important; min-width: 0 !important; }
+  header .vg-brand > span:last-child { min-width: 0 !important; }
+  header .vg-brand strong { font-size: 18px !important; }
+  header .vg-brand small { font-size: 11px !important; }
+  header .vg-logo { flex-basis: 44px !important; width: 44px !important; height: 44px !important; }
   main > section { overflow: hidden; }
-  .vg-brand small { max-width: 150px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .vg-now { white-space: nowrap; }
   .vg-hero h1 { font-size: 32px !important; }
   .vg-hero-copy p { font-size: 17px !important; }
