@@ -29,16 +29,8 @@ body { overflow-x: hidden; }
   font-size: 0 !important;
   overflow: hidden;
 }
-.vg-brand > span:last-child {
-  min-width: 0;
-  display: block;
-}
-.vg-brand strong {
-  display: block;
-  color: #101828 !important;
-  white-space: nowrap;
-  line-height: 1.1;
-}
+.vg-brand > span:last-child { min-width: 0; display: block; }
+.vg-brand strong { display: block; color: #101828 !important; white-space: nowrap; line-height: 1.1; }
 .vg-brand small {
   display: block;
   color: #475467 !important;
@@ -53,6 +45,11 @@ body { overflow-x: hidden; }
 }
 .vg-agora { gap: 14px !important; }
 .vg-agora span { white-space: nowrap; }
+
+/* Vetor Pro: contraste editorial forte */
+.vg-pro h2 { color: #fff !important; }
+.vg-pro p { color: #c9d3df !important; }
+.vg-pro button { background: #155eef !important; color: #fff !important; border: 0 !important; }
 
 @media (max-width: 720px) {
   #root { overflow-x: hidden; }
@@ -104,7 +101,6 @@ body { overflow-x: hidden; }
   .vg-markets { width: 100% !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
   .vg-markets button { min-width: 0 !important; overflow: hidden !important; }
   .vg-markets b { overflow-wrap: anywhere; }
-
   .vg-pro, .vg-newsletter { overflow: hidden !important; }
 }
 
