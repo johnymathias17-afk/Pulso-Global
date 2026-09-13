@@ -3,7 +3,6 @@ import fs from 'node:fs'
 const path = 'src/App.jsx'
 let s = fs.readFileSync(path, 'utf8')
 s = s.replaceAll('Informação que move decisões.', 'Informações que movem decisões.')
-// Improve mobile readability without changing the premium visual hierarchy.
 s = s.replaceAll("color: '#667085', fontSize: '11px'", "color: '#475467', fontSize: '11px', fontWeight: '500'")
 s = s.replaceAll("color: '#475467', fontSize: '17px'", "color: '#344054', fontSize: '17px', fontWeight: '500'")
 s = s.replaceAll("color: '#475467', fontSize: '16px'", "color: '#344054', fontSize: '16px', fontWeight: '500'")
@@ -20,5 +19,14 @@ if (!s.includes('const scoreEditorial =')) {
 // Make the hero communicate that the lead is an editorial selection and the live rail is useful, not a raw count.
 s = s.replaceAll('Vetor Global • AGORA</span>', 'Vetor Global • VETOR SELECIONA</span>')
 s = s.replaceAll("${noticiasFiltradas.length} notícias em destaque", 'Cobertura em tempo real')
+
+// High-retention discovery rail: a compact 'Mais lidas' module based on the same editorial ranking.
+if (!s.includes('vg-most-read')) {
+  const mostRead = `<section className="vg-section vg-most-read"><div className="vg-section-head"><div><span className="eyebrow">PARA NÃO PERDER</span><h2>Mais lidas</h2></div><span className="live">● SELEÇÃO EDITORIAL</span></div><div className="vg-most-read-list">{selecionadas.slice(0, 5).map((article, index) => { const item = noticiaApresentavel(article); return <a className="vg-most-read-item" href={\\`/noticia/${encodeURIComponent(item.id)}\\`} key={item.id}><span>{String(index + 1).padStart(2, '0')}</span><div><strong>{item.displayTitle}</strong><small>{item.displaySource} • {dataFormatada(item.published_at || item.created_at)}</small></div></a> })}</div></section>`
+  s = s.replace('<section className="vg-section" id="mercados">', mostRead + '\n\n      <section className="vg-section" id="mercados">')
+  const cssPatch = `.vg-most-read-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.vg-most-read-item{display:flex;gap:10px;min-width:0;padding:15px;text-decoration:none;background:#fff;border:1px solid #e4e7ec;border-radius:12px;color:#101828}.vg-most-read-item>span{font-size:24px;font-weight:900;color:#d4a72c;line-height:1}.vg-most-read-item strong{display:block;font-family:Georgia,\"Times New Roman\",serif;font-size:16px;line-height:1.18}.vg-most-read-item small{display:block;color:#667085;font-size:10px;margin-top:9px}.vg-most-read-item:hover{border-color:#b2ccff;transform:translateY(-1px)}@media(max-width:900px){.vg-most-read-list{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.vg-most-read-list{grid-template-columns:1fr}.vg-most-read-item{padding:14px}.vg-most-read-item strong{font-size:18px}.vg-most-read-item small{font-size:12px}}`
+  s = s.replace('const css = `', 'const css = `' + cssPatch)
+}
+
 fs.writeFileSync(path, s)
-console.log('Brand, readability and editorial intelligence patch applied')
+console.log('Brand, readability, editorial intelligence and discovery patch applied')
