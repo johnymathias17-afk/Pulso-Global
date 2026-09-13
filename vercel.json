@@ -4,6 +4,8 @@
     { "source": "/news-sitemap.xml", "destination": "/api/news-sitemap.xml" },
     { "source": "/rss.xml", "destination": "/api/rss.xml" },
     { "source": "/noticia/:id", "destination": "/api/noticia-premium?id=:id" },
+    { "source": "/metodologia", "destination": "/metodologia.html" },
+    { "source": "/redacao", "destination": "/redacao.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
