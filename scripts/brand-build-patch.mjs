@@ -17,7 +17,8 @@ if (!s.includes('const scoreEditorial =')) {
   s = s.replace("const apresentaveis = noticiasFiltradas.map(noticiaApresentavel)\n  const destaque = apresentaveis[0]\n  const ultimas = apresentaveis.slice(1, 7)", "const apresentaveis = noticiasFiltradas.map(noticiaApresentavel)\n  const destaque = selecionarDestaque(noticiasFiltradas).map(noticiaApresentavel)[0]\n  const ultimas = apresentaveis.filter(article => article.id !== destaque?.id).slice(0, 6)")
 }
 
-// Make the hero communicate that the lead is an editorial selection.
+// Make the hero communicate that the lead is an editorial selection and the live rail is useful, not a raw count.
 s = s.replaceAll('Vetor Global • AGORA</span>', 'Vetor Global • VETOR SELECIONA</span>')
+s = s.replaceAll("${noticiasFiltradas.length} notícias em destaque", 'Cobertura em tempo real')
 fs.writeFileSync(path, s)
 console.log('Brand, readability and editorial intelligence patch applied')
