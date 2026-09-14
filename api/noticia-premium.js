@@ -54,8 +54,9 @@ export default async function handler(req, res) {
 
     const bar = `<div class="vg-premium-bar"><div><div class="vg-premium-label">Leitura Vetor</div><div style="font:700 13px Arial,sans-serif;color:#334155;margin-top:3px">Entenda o fato, o impacto e o que observar.</div></div><div class="vg-actions"><button class="primary" onclick="navigator.share?navigator.share({title:document.title,url:location.href}):navigator.clipboard.writeText(location.href).then(()=>alert('Link copiado.'))">Compartilhar</button><a href="https://wa.me/?text=${shareText}" target="_blank" rel="noopener noreferrer">WhatsApp</a></div></div>`;
     const context = `<div class="vg-context"><strong>O diferencial do Vetor Global</strong><p>Não basta informar o que aconteceu. Nossa leitura editorial ajuda você a entender <b>por que isso importa</b> e quais são os próximos pontos que merecem atenção.</p></div>`;
+    const viewTracker = `<script>(function(){try{if(!sessionStorage.getItem('vg_view_${id}')){sessionStorage.setItem('vg_view_${id}','1');fetch('/api/registrar-view?id=${encodeURIComponent(id)}',{method:'POST',keepalive:true,headers:{accept:'application/json'}}).catch(function(){});}}catch(e){}})();</script>`;
 
-    const out = html.replace('</head>', `${style}</head>`).replace('<main class="wrap">', `<main class="wrap">${bar}`).replace('</main>', `${context}${related}</main>`);
+    const out = html.replace('</head>', `${style}</head>`).replace('<main class="wrap">', `<main class="wrap">${bar}`).replace('</main>', `${context}${related}${viewTracker}</main>`);
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=1800');
     return res.status(200).send(out);
