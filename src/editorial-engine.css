@@ -6,4 +6,46 @@
 .vetor-impacto strong{color:#155eef;font-size:9px;letter-spacing:.8px;text-transform:uppercase}
 .vetor-cenario{margin:8px 0 0;color:#475467;font-size:12px;line-height:1.55}
 .vetor-cenario strong{color:#155eef;font-size:9px;letter-spacing:.8px;text-transform:uppercase}
-@media(max-width:720px){#mercados .atualizacao{font-size:9px;white-space:nowrap}.vetor-editorial-signal{font-size:8px!important}.noticiasGrid>article{min-width:0;overflow:hidden}.noticiasGrid>article h3{overflow-wrap:anywhere}.vetor-contexto{font-size:11px;padding:9px 10px}.vetor-impacto,.vetor-cenario{font-size:11px}}
+
+/* Final mobile editorial alignment: Radar must match the approved large type scale. */
+.vg-impact-section .vg-impact h3{font-size:28px!important;line-height:1.18!important;letter-spacing:-.35px!important;max-width:100%!important;overflow-wrap:anywhere!important}
+.vg-impact-section .vg-impact p{font-size:18px!important;line-height:1.5!important}
+.vg-impact-section .vg-impact strong{font-size:17px!important}
+.vg-impact-section .vg-impact small{font-size:14px!important}
+.vg-impact-section .vg-impact a{font-size:17px!important;font-weight:750!important}
+
+/* Never allow the phone viewport to be exceeded. */
+.vg-site,.vg-main,.vg-header,.vg-menu,.vg-section,.vg-hero,.vg-two,.vg-grid,.vg-impact-grid,.vg-markets,.vg-pro,.vg-card,.vg-impact,.vg-lead{box-sizing:border-box;max-width:100%;min-width:0}
+@media(max-width:720px){
+ html,body,#root{max-width:100%;overflow-x:hidden}
+ .vg-site{width:100%;overflow-x:hidden}
+ .vg-main{width:100%;padding-left:16px;padding-right:16px;overflow-x:hidden}
+ .vg-section,.vg-hero,.vg-two{width:100%;margin-left:0;margin-right:0}
+ .vg-grid,.vg-impact-grid,.vg-markets{width:100%;min-width:0}
+ .vg-card,.vg-impact,.vg-lead{min-width:0;overflow:hidden}
+ .vg-card h3,.vg-impact h3,.vg-lead h3,.vg-card p,.vg-impact p,.vg-lead p{overflow-wrap:anywhere}
+ .vg-impact-section .vg-impact h3{font-size:27px!important;line-height:1.2!important}
+ .vg-impact-section .vg-impact p{font-size:18px!important}
+ .vg-impact-section .vg-impact small{font-size:13px!important}
+ .vg-impact-section .vg-impact a{font-size:17px!important}
+ .vg-pro{width:100%;padding:28px 22px!important;overflow:hidden}
+ .vg-pro>div{min-width:0;max-width:100%;overflow:hidden}
+ .vg-pro h2{font-size:clamp(32px,8.5vw,42px)!important;line-height:1.08!important;max-width:100%;overflow-wrap:anywhere}
+ .vg-pro p{font-size:18px!important;line-height:1.5!important;max-width:100%;overflow-wrap:anywhere}
+ .vg-pro button{width:100%;box-sizing:border-box;max-width:100%;margin-top:24px;padding:16px 14px!important;font-size:17px!important}
+}
+@media(max-width:480px){
+ .vg-main{padding-left:14px;padding-right:14px}
+ .vg-impact-section .vg-impact h3{font-size:26px!important;line-height:1.2!important}
+ .vg-impact-section .vg-impact p{font-size:18px!important}
+ .vg-impact-section .vg-impact a{font-size:16px!important}
+ .vg-pro{padding:26px 20px!important;border-radius:22px}
+ .vg-pro h2{font-size:32px!important;line-height:1.1!important}
+ .vg-pro p{font-size:17px!important}
+}
+@media(max-width:360px){
+ .vg-main{padding-left:12px;padding-right:12px}
+ .vg-impact-section .vg-impact h3{font-size:25px!important}
+ .vg-pro{padding:24px 18px!important}
+ .vg-pro h2{font-size:29px!important}
+}
