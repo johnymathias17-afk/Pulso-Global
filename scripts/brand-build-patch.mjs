@@ -84,5 +84,12 @@ if (!s.includes('vg-agora-polish')) {
   s = s.replace('<span>● AGORA</span><strong>{loading ? \'Atualizando o portal…\' : \'Cobertura em tempo real\'}</strong>', '<div className="vg-agora-polish"><span className="agora-dot">●</span><span className="agora-label">AGORA</span><span className="agora-copy">{loading ? \'Atualizando o portal…\' : \'Cobertura em tempo real\'}</span></div>')
 }
 
+// VETOR PRO responsive composition: generous safe area, natural wrapping and a full-width mobile CTA.
+if (!s.includes('vg-pro-safe')) {
+  const proCss = `.vg-pro-safe{padding:clamp(30px,4vw,48px);border-radius:20px;overflow:hidden}.vg-pro-safe .vg-pro-copy{min-width:0;max-width:900px}.vg-pro-safe h2{max-width:780px;line-height:1.05;overflow-wrap:anywhere}.vg-pro-safe p{max-width:820px}.vg-pro-safe .vg-pro-cta{flex:0 0 auto;white-space:nowrap}@media(max-width:760px){.vg-pro-safe{padding:28px 22px;display:block}.vg-pro-safe .vg-pro-copy{width:100%}.vg-pro-safe h2{font-size:clamp(30px,8vw,38px);line-height:1.08;margin:10px 0 14px}.vg-pro-safe p{font-size:17px;line-height:1.55}.vg-pro-safe .vg-pro-cta{width:100%;margin-top:20px;padding:15px 16px;font-size:16px}}@media(max-width:480px){.vg-pro-safe{padding:26px 20px}.vg-pro-safe h2{font-size:30px;line-height:1.1}.vg-pro-safe p{font-size:17px}}`
+  s = s.replace('const css = `', 'const css = `' + proCss)
+  s = s.replace('<section className="vg-pro"><div><span className="eyebrow">VETOR PRO • EM DESENVOLVIMENTO</span><h2>Mais contexto. Menos ruído.</h2><p>Análises, cenários e leitura de impacto para quem quer entender o que está por trás da notícia.</p></div><button onClick={() => document.getElementById(\'newsletter\')?.scrollIntoView({ behavior: \'smooth\' })}>Quero acompanhar →</button></section>', '<section className="vg-pro vg-pro-safe"><div className="vg-pro-copy"><span className="eyebrow">VETOR PRO • EM DESENVOLVIMENTO</span><h2>Mais contexto. Menos ruído.</h2><p>Análises, cenários e leitura de impacto para quem quer entender o que está por trás da notícia.</p></div><button className="vg-pro-cta" onClick={() => document.getElementById(\'newsletter\')?.scrollIntoView({ behavior: \'smooth\' })}>Quero acompanhar →</button></section>')
+}
+
 fs.writeFileSync(path, s)
-console.log('Brand, readability, editorial intelligence, 24h shelf life, real-audience ranking, discovery and AGORA hierarchy patch applied')
+console.log('Brand, readability, editorial intelligence, 24h shelf life, real-audience ranking, discovery, AGORA hierarchy and VETOR PRO responsive safety patch applied')
