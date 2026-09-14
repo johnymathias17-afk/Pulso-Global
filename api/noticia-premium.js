@@ -3,6 +3,9 @@ function esc(v = '') {
 }
 
 function cleanText(v = '') { return String(v).replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim(); }
+function normalize(v = '') { return cleanText(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s]/g, ' '); }
+function tokens(v = '') { return new Set(normalize(v).split(/\s+/).filter(w => w.length >= 4 && !['para','como','sobre','mais','esta','esse','isso','pela','pelo','entre','quando','deve','pode','apos','antes','contra','tambem','ainda','hoje','desde','ser','sua','seu','uma','umas','uns','dos','das'].includes(w))); }
+function overlap(a, b) { const A = tokens(a); const B = tokens(b); let n = 0; for (const x of A) if (B.has(x)) n++; return A.size ? n / A.size : 0; }
 
 export default async function handler(req, res) {
   const id = String(req.query?.id || '').replace(/[^a-zA-Z0-9_-]/g, '');
@@ -27,20 +30,27 @@ export default async function handler(req, res) {
     try {
       const sitemap = await fetch(`${base}/sitemap.xml`, { headers: { accept: 'application/xml' } });
       const xml = await sitemap.text();
-      const ids = [...xml.matchAll(/<loc>[^<]*\/noticia\/([^<]+)<\/loc>/g)].map(m => m[1]).filter(x => x !== id).slice(0, 6);
-      const items = await Promise.all(ids.map(async rid => {
+      const ids = [...xml.matchAll(/<loc>[^<]*\/noticia\/([^<]+)<\/loc>/g)].map(m => m[1]).filter(x => x !== id).slice(0, 24);
+      const candidates = await Promise.all(ids.map(async rid => {
         try {
           const r = await fetch(`${base}/api/noticia?id=${encodeURIComponent(rid)}`, { headers: { accept: 'text/html' } });
           if (!r.ok) return null;
           const h = await r.text();
           const tm = h.match(/<h1 class="title">([\s\S]*?)<\/h1>/i);
+          const sm = h.match(/<p class="summary">([\s\S]*?)<\/p>/i);
+          const tg = h.match(/<div class="tag">([\s\S]*?)<\/div>/i);
           if (!tm) return null;
           const rt = cleanText(tm[1]);
-          return `<a class="vg-related-item" href="/noticia/${encodeURIComponent(rid)}"><span>VETOR GLOBAL</span>${esc(rt)}<b>Entender o contexto →</b></a>`;
+          const rs = sm ? cleanText(sm[1]) : '';
+          const rc = tg ? cleanText(tg[1]) : '';
+          const score = overlap(`${title} ${html.match(/<p class="summary">([\s\S]*?)<\/p>/i)?.[1] || ''}`, `${rt} ${rs}`) * 100 + (normalize(rc) === normalize(tg?.[1] || '') ? 10 : 0);
+          return { id: rid, title: rt, score, source: rc };
         } catch { return null; }
       }));
-      const valid = items.filter(Boolean).slice(0, 3);
-      if (valid.length) related = `<section class="vg-related"><div class="vg-section-label">Continue no Vetor</div><h2>Leia também</h2><div class="vg-related-grid">${valid.join('')}</div></section>`;
+      const valid = candidates.filter(Boolean).sort((a,b) => b.score - a.score).slice(0, 3);
+      if (valid.length) {
+        related = `<section class="vg-related"><div class="vg-section-label">Continue no Vetor</div><h2>Leia também</h2><p class="vg-related-intro">Outras matérias selecionadas por proximidade de assunto e relevância editorial.</p><div class="vg-related-grid">${valid.map(item => `<a class="vg-related-item" href="/noticia/${encodeURIComponent(item.id)}"><span>VETOR GLOBAL${item.source ? ` • ${esc(item.source)}` : ''}</span>${esc(item.title)}<b>Entender o contexto →</b></a>`).join('')}</div></section>`;
+      }
     } catch {}
 
     const style = `<style>
@@ -48,8 +58,8 @@ export default async function handler(req, res) {
       .vg-premium-label{font-size:11px;font-weight:800;letter-spacing:.12em;color:#155eef;text-transform:uppercase}
       .vg-actions{display:flex;gap:8px;flex-wrap:wrap}.vg-actions a,.vg-actions button{appearance:none;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#0b1220;text-decoration:none;padding:8px 11px;font:700 12px Arial,sans-serif;cursor:pointer}.vg-actions a.primary,.vg-actions button.primary{background:#155eef;color:#fff;border-color:#155eef}
       .vg-context{margin:28px 0;padding:22px;border-radius:16px;background:linear-gradient(135deg,#0b1220,#14213d);color:#fff}.vg-context strong{display:block;margin-bottom:7px;font-size:12px;letter-spacing:.1em;color:#d4a72c;text-transform:uppercase}.vg-context p{margin:0;font-size:16px;line-height:1.6;color:#e8edf5}
-      .vg-related{margin-top:34px;padding-top:28px;border-top:1px solid #e4e7ec}.vg-related h2{font:800 28px Georgia,serif;margin:6px 0 16px;color:#101828}.vg-section-label{font:800 11px Arial,sans-serif;letter-spacing:.12em;color:#155eef;text-transform:uppercase}.vg-related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.vg-related-item{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:#101828;background:#fff;border:1px solid #e4e7ec;border-radius:14px;padding:15px;font:700 16px/1.3 Georgia,serif}.vg-related-item span{font:800 10px Arial,sans-serif;letter-spacing:.1em;color:#155eef}.vg-related-item b{font:800 11px Arial,sans-serif;color:#155eef;margin-top:auto}
-      @media(max-width:600px){.vg-premium-bar{align-items:flex-start;flex-direction:column}.vg-actions{width:100%}.vg-actions a,.vg-actions button{flex:1;text-align:center}.vg-context{padding:19px}.vg-context p{font-size:17px}.vg-related-grid{grid-template-columns:1fr}.vg-related h2{font-size:25px}}
+      .vg-related{margin-top:34px;padding-top:28px;border-top:1px solid #e4e7ec}.vg-related h2{font:800 28px Georgia,serif;margin:6px 0 6px;color:#101828}.vg-section-label{font:800 11px Arial,sans-serif;letter-spacing:.12em;color:#155eef;text-transform:uppercase}.vg-related-intro{margin:0 0 16px;color:#667085;font:14px/1.5 Arial,sans-serif}.vg-related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.vg-related-item{display:flex;flex-direction:column;gap:8px;text-decoration:none;color:#101828;background:#fff;border:1px solid #e4e7ec;border-radius:14px;padding:15px;font:700 16px/1.3 Georgia,serif}.vg-related-item span{font:800 10px Arial,sans-serif;letter-spacing:.1em;color:#155eef}.vg-related-item b{font:800 11px Arial,sans-serif;color:#155eef;margin-top:auto}
+      @media(max-width:600px){.vg-premium-bar{align-items:flex-start;flex-direction:column}.vg-actions{width:100%}.vg-actions a,.vg-actions button{flex:1;text-align:center}.vg-context{padding:19px}.vg-context p{font-size:17px}.vg-related-grid{grid-template-columns:1fr}.vg-related h2{font-size:25px}.vg-related-intro{font-size:15px}}
     </style>`;
 
     const bar = `<div class="vg-premium-bar"><div><div class="vg-premium-label">Leitura Vetor</div><div style="font:700 13px Arial,sans-serif;color:#334155;margin-top:3px">Entenda o fato, o impacto e o que observar.</div></div><div class="vg-actions"><button class="primary" onclick="navigator.share?navigator.share({title:document.title,url:location.href}):navigator.clipboard.writeText(location.href).then(()=>alert('Link copiado.'))">Compartilhar</button><a href="https://wa.me/?text=${shareText}" target="_blank" rel="noopener noreferrer">WhatsApp</a></div></div>`;
