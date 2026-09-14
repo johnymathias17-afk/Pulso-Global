@@ -77,5 +77,12 @@ if (!s.includes('vg-most-read')) {
   s = s.replace('const css = `', 'const css = `' + cssPatch)
 }
 
+// Polish the AGORA rail on mobile: make the status label proportionate to the headline beside it.
+if (!s.includes('vg-agora-polish')) {
+  const agoraCss = `.vg-agora-polish{display:inline-flex;align-items:center;gap:7px}.vg-agora-polish .agora-dot{font-size:15px;line-height:1}.vg-agora-polish .agora-label{font-size:19px;font-weight:800;letter-spacing:.2px}.vg-agora-polish .agora-copy{font-size:24px;font-weight:800;letter-spacing:-.3px}@media(max-width:600px){.vg-agora-polish{gap:7px}.vg-agora-polish .agora-label{font-size:18px}.vg-agora-polish .agora-copy{font-size:24px}.vg-agora-polish + *{margin-top:22px!important}}`
+  s = s.replace('const css = `', 'const css = `' + agoraCss)
+  s = s.replace('<span>● AGORA</span><strong>{loading ? \'Atualizando o portal…\' : \'Cobertura em tempo real\'}</strong>', '<div className="vg-agora-polish"><span className="agora-dot">●</span><span className="agora-label">AGORA</span><span className="agora-copy">{loading ? \'Atualizando o portal…\' : \'Cobertura em tempo real\'}</span></div>')
+}
+
 fs.writeFileSync(path, s)
-console.log('Brand, readability, editorial intelligence, 24h shelf life, real-audience ranking and discovery patch applied')
+console.log('Brand, readability, editorial intelligence, 24h shelf life, real-audience ranking, discovery and AGORA hierarchy patch applied')
