@@ -24,7 +24,6 @@ const scoreEditorial = article => {
   const titleScore = title.length >= 35 && title.length <= 120 ? 8 : title.length > 20 ? 4 : 0
   const trusted = /(reuters|bbc|cnn brasil|cnn|uol|folha|valor|estadao|estadão|g1|agencia brasil|bloomberg|financial times|money times|portal do bitcoin|vista patria|dallagnol)/i.test(source) ? 9 : 4
   const impact = /(fed|fomc|juros|inflacao|ipca|cpi|dolar|ibovespa|bitcoin|ethereum|cripto|guerra|petroleo|petróleo|stf|supremo|moraes|trump|magnitsky|ministro|ministros|governo|congresso|eleicao|eleição|tarifa|china|eua|ia|inteligencia artificial|tecnologia|sanção|sancao|crise|decisão|decisao)/i.test(title + ' ' + summary) ? 8 : 0
-  // Engagement signal: power, conflict, sanctions and decisions usually outperform generic ranking/list stories.
   const engagement = /(trump|moraes|stf|supremo|magnitsky|sanções|sancoes|ministro|ministros|crise|guerra|prisão|prisao|confronto|afastamento|investigação|investigacao|vaza|escândalo|escandalo|decisão|decisao|sanção|sancao|tarifa|ameaça|ameaca|urgente)/i.test(title + ' ' + summary) ? 18 : 0
   const lowEngagement = /(mais procurad|mais buscad|segundo investimento|aves|fauna|horóscopo|horoscopo|previsão do tempo|previsao do tempo)/i.test(title) ? -16 : 0
   return freshness + image + summaryScore + titleScore + trusted + impact + engagement + lowEngagement
@@ -52,12 +51,24 @@ if (!s.includes('const [maisLidas, setMaisLidas]')) {
   s = s.replace("  async function inscreverNewsletter(e)", effectPatch + "\n  async function inscreverNewsletter(e)")
 }
 
+// Broaden the live homepage window. The database remains the permanent archive.
+s = s.replaceAll(".order('published_at', { ascending: false, nullsFirst: false }).limit(50)", ".order('published_at', { ascending: false, nullsFirst: false }).limit(150)")
+
 s = s.replaceAll('Vetor Global • AGORA</span>', 'Vetor Global • VETOR SELECIONA</span>')
 s = s.replaceAll("${noticiasFiltradas.length} notícias em destaque", 'Cobertura em tempo real')
 
 // Make the Radar Cripto CTA a real navigation target instead of only changing the category filter.
 s = s.replace("<button className=\"ghost\" onClick={() => navegar('cripto')}>₿ Radar Cripto</button>", "<button className=\"ghost\" onClick={() => { setActive('cripto'); requestAnimationFrame(() => document.getElementById('radar-cripto')?.scrollIntoView({ behavior: 'smooth', block: 'start' })) }}>₿ Radar Cripto</button>")
 s = s.replace('<section className="vg-two"><Categoria titulo="₿ Radar Cripto"', '<section className="vg-two" id="radar-cripto"><Categoria titulo="₿ Radar Cripto"')
+
+// 24h editorial shelf life: strong recent stories remain discoverable while the lead can rotate.
+if (!s.includes('vg-shelf')) {
+  s = s.replace("  const radarImpacto = selecionadas.filter(item => item?.id !== destaque?.id).slice(0, 3)\n", "  const radarImpacto = selecionadas.filter(item => item?.id !== destaque?.id).slice(0, 3)\n  const shelfCutoff = Date.now() - 24 * 3600000\n  const emDestaque = useMemo(() => rankingEditorial(noticiasFiltradas.filter(item => new Date(item?.published_at || item?.created_at || 0).getTime() >= shelfCutoff)).filter(item => item?.id !== destaque?.id).slice(0, 4), [noticiasFiltradas, destaque])\n")
+  const shelf = `<section className="vg-section vg-shelf"><div className="vg-section-head"><div><span className="eyebrow">24 HORAS</span><h2>Em destaque</h2></div><span className="live">● HISTÓRIAS QUE AINDA IMPORTAM</span></div><div className="vg-grid">{emDestaque.map(article => <Article key={article.id} article={article} />)}</div></section>`
+  s = s.replace('<section className="vg-section vg-impact-section">', shelf + '\n\n      <section className="vg-section vg-impact-section">')
+  const shelfCss = `.vg-shelf{border-top:1px solid #e4e7ec}.vg-shelf .vg-section-head{margin-bottom:18px}`
+  s = s.replace('const css = `', 'const css = `' + shelfCss)
+}
 
 if (!s.includes('vg-most-read')) {
   const mostRead = `<section className="vg-section vg-most-read"><div className="vg-section-head"><div><span className="eyebrow">AUDIÊNCIA REAL</span><h2>Mais lidas</h2></div><span className="live">● ÚLTIMAS VISUALIZAÇÕES</span></div>{maisLidas.length ? <div className="vg-most-read-list">{maisLidas.map((article, index) => { const item = noticiaApresentavel(article); return <a className="vg-most-read-item" href={"/noticia/" + encodeURIComponent(item.id)} key={item.id}><span>{String(index + 1).padStart(2, '0')}</span><div><strong>{item.displayTitle}</strong><small>{item.displaySource} • {article.view_count} {article.view_count === 1 ? 'visualização' : 'visualizações'}</small></div></a> })}</div> : <div className="vg-empty">O ranking de audiência está sendo construído com visualizações reais.</div>}</section>`
@@ -67,4 +78,4 @@ if (!s.includes('vg-most-read')) {
 }
 
 fs.writeFileSync(path, s)
-console.log('Brand, readability, editorial intelligence, real-audience ranking and discovery patch applied')
+console.log('Brand, readability, editorial intelligence, 24h shelf life, real-audience ranking and discovery patch applied')
