@@ -29,20 +29,35 @@ const scoreEditorial = article => {
 const selecionarDestaque = items => [...items].sort((a, b) => { const diff = scoreEditorial(b) - scoreEditorial(a); if (diff) return diff; return new Date(b?.published_at || b?.created_at || 0) - new Date(a?.published_at || a?.created_at || 0) })
 `
   s = s.replace("function dataFormatada(data)", intelligence + "function dataFormatada(data)")
-  s = s.replace("const apresentaveis = noticiasFiltradas.map(noticiaApresentavel)\n  const destaque = apresentaveis[0]\n  const ultimas = apresentaveis.slice(1, 7)", "const apresentaveis = noticiasFiltradas.map(noticiaApresentavel)\n  const destaque = selecionarDestaque(noticiasFiltradas).map(noticiaApresentavel)[0]\n  const ultimas = apresentaveis.filter(article => article.id !== destaque?.id).slice(0, 6)")
 }
 
-// Make the hero communicate that the lead is an editorial selection and the live rail is useful, not a raw count.
+// Real audience data for 'Mais Lidas'. Never fabricate readership.
+if (!s.includes('const [maisLidas, setMaisLidas]')) {
+  s = s.replace("  const [newsletterAceita, setNewsletterAceita] = useState(true)\n", "  const [newsletterAceita, setNewsletterAceita] = useState(true)\n  const [maisLidas, setMaisLidas] = useState([])\n")
+  const effectPatch = `
+  useEffect(() => {
+    async function carregarMaisLidas() {
+      const { data, error } = await supabase.from('article_views').select('article_id,view_count').order('view_count', { ascending: false }).limit(20)
+      if (error) { console.error('Erro ao carregar Mais Lidas:', error); return }
+      const byId = new Map((data || []).map(row => [String(row.article_id), Number(row.view_count || 0)]))
+      const ranked = articles.filter(a => byId.has(String(a.id))).map(a => ({ ...a, view_count: byId.get(String(a.id)) || 0 })).sort((a, b) => b.view_count - a.view_count)
+      setMaisLidas(ranked.slice(0, 5))
+    }
+    if (articles.length) carregarMaisLidas()
+  }, [articles])
+`
+  s = s.replace("  async function inscreverNewsletter(e)", effectPatch + "\n  async function inscreverNewsletter(e)")
+}
+
 s = s.replaceAll('Vetor Global • AGORA</span>', 'Vetor Global • VETOR SELECIONA</span>')
 s = s.replaceAll("${noticiasFiltradas.length} notícias em destaque", 'Cobertura em tempo real')
 
-// High-retention discovery rail: a compact 'Mais lidas' module based on the same editorial ranking.
 if (!s.includes('vg-most-read')) {
-  const mostRead = `<section className="vg-section vg-most-read"><div className="vg-section-head"><div><span className="eyebrow">PARA NÃO PERDER</span><h2>Mais lidas</h2></div><span className="live">● SELEÇÃO EDITORIAL</span></div><div className="vg-most-read-list">{selecionadas.slice(0, 5).map((article, index) => { const item = noticiaApresentavel(article); return <a className="vg-most-read-item" href={"/noticia/" + encodeURIComponent(item.id)} key={item.id}><span>{String(index + 1).padStart(2, '0')}</span><div><strong>{item.displayTitle}</strong><small>{item.displaySource} • {dataFormatada(item.published_at || item.created_at)}</small></div></a> })}</div></section>`
+  const mostRead = `<section className="vg-section vg-most-read"><div className="vg-section-head"><div><span className="eyebrow">AUDIÊNCIA REAL</span><h2>Mais lidas</h2></div><span className="live">● ÚLTIMAS VISUALIZAÇÕES</span></div>{maisLidas.length ? <div className="vg-most-read-list">{maisLidas.map((article, index) => { const item = noticiaApresentavel(article); return <a className="vg-most-read-item" href={"/noticia/" + encodeURIComponent(item.id)} key={item.id}><span>{String(index + 1).padStart(2, '0')}</span><div><strong>{item.displayTitle}</strong><small>{item.displaySource} • {article.view_count} {article.view_count === 1 ? 'visualização' : 'visualizações'}</small></div></a> })}</div> : <div className="vg-empty">O ranking de audiência está sendo construído com visualizações reais.</div>}</section>`
   s = s.replace('<section className="vg-section" id="mercados">', mostRead + '\n\n      <section className="vg-section" id="mercados">')
   const cssPatch = `.vg-most-read-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.vg-most-read-item{display:flex;gap:10px;min-width:0;padding:15px;text-decoration:none;background:#fff;border:1px solid #e4e7ec;border-radius:12px;color:#101828}.vg-most-read-item>span{font-size:24px;font-weight:900;color:#d4a72c;line-height:1}.vg-most-read-item strong{display:block;font-family:Georgia,"Times New Roman",serif;font-size:16px;line-height:1.18}.vg-most-read-item small{display:block;color:#667085;font-size:10px;margin-top:9px}.vg-most-read-item:hover{border-color:#b2ccff;transform:translateY(-1px)}@media(max-width:900px){.vg-most-read-list{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.vg-most-read-list{grid-template-columns:1fr}.vg-most-read-item{padding:14px}.vg-most-read-item strong{font-size:18px}.vg-most-read-item small{font-size:12px}}`
   s = s.replace('const css = `', 'const css = `' + cssPatch)
 }
 
 fs.writeFileSync(path, s)
-console.log('Brand, readability, editorial intelligence and discovery patch applied')
+console.log('Brand, readability, editorial intelligence, real-audience ranking and discovery patch applied')
