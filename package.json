@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "prebuild": "node scripts/brand-build-patch.mjs",
+    "prebuild": "node scripts/brand-build-patch.mjs && node scripts/ui-polish-patch.mjs",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
