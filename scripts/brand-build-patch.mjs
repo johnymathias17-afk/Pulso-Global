@@ -2,6 +2,8 @@ import fs from 'node:fs'
 
 const path = 'src/App.jsx'
 let s = fs.readFileSync(path, 'utf8')
+
+// Text/readability baseline.
 s = s.replaceAll('Informação que move decisões.', 'Informações que movem decisões.')
 s = s.replaceAll("color: '#667085', fontSize: '11px'", "color: '#475467', fontSize: '11px', fontWeight: '500'")
 s = s.replaceAll("color: '#475467', fontSize: '17px'", "color: '#344054', fontSize: '17px', fontWeight: '500'")
@@ -9,7 +11,7 @@ s = s.replaceAll("color: '#475467', fontSize: '16px'", "color: '#344054', fontSi
 s = s.replaceAll("color: '#667085'", "color: '#475467'")
 s = s.replaceAll("color: '#98A2B3'", "color: '#667085'")
 
-// Editorial intelligence: select the strongest lead without sacrificing chronological 'Últimas'.
+// Editorial intelligence.
 if (!s.includes('const scoreEditorial =')) {
   const intelligence = `
 const scoreEditorial = article => {
@@ -22,25 +24,28 @@ const scoreEditorial = article => {
   const image = article?.image_url ? 9 : 0
   const summaryScore = summary.length >= 80 ? 12 : summary.length >= 40 ? 7 : 0
   const titleScore = title.length >= 35 && title.length <= 120 ? 8 : title.length > 20 ? 4 : 0
-  const trusted = /(reuters|bbc|cnn brasil|cnn|uol|folha|valor|estadao|estadão|g1|agencia brasil|bloomberg|financial times|money times|portal do bitcoin|vista patria|dallagnol)/i.test(source) ? 9 : 4
+  const trusted = /(reuters|bbc|cnn brasil|cnn|uol|folha|valor|estadao|estadão|g1|agencia brasil|bloomberg|financial times|money times|portal do bitcoin)/i.test(source) ? 9 : 4
   const impact = /(fed|fomc|juros|inflacao|ipca|cpi|dolar|ibovespa|bitcoin|ethereum|cripto|guerra|petroleo|petróleo|stf|supremo|moraes|trump|magnitsky|ministro|ministros|governo|congresso|eleicao|eleição|tarifa|china|eua|ia|inteligencia artificial|tecnologia|sanção|sancao|crise|decisão|decisao)/i.test(title + ' ' + summary) ? 8 : 0
   const engagement = /(trump|moraes|stf|supremo|magnitsky|sanções|sancoes|ministro|ministros|crise|guerra|prisão|prisao|confronto|afastamento|investigação|investigacao|vaza|escândalo|escandalo|decisão|decisao|sanção|sancao|tarifa|ameaça|ameaca|urgente)/i.test(title + ' ' + summary) ? 18 : 0
   const lowEngagement = /(mais procurad|mais buscad|segundo investimento|aves|fauna|horóscopo|horoscopo|previsão do tempo|previsao do tempo)/i.test(title) ? -16 : 0
   return freshness + image + summaryScore + titleScore + trusted + impact + engagement + lowEngagement
 }
-const selecionarDestaque = items => [...items].sort((a, b) => { const diff = scoreEditorial(b) - scoreEditorial(a); if (diff) return diff; return new Date(b?.published_at || b?.created_at || 0) - new Date(a?.published_at || a?.created_at || 0) })
+const rankingEditorial = items => [...items].sort((a, b) => { const diff = scoreEditorial(b) - scoreEditorial(a); if (diff) return diff; return new Date(b?.published_at || b?.created_at || 0) - new Date(a?.published_at || a?.created_at || 0) })
 `
   s = s.replace("function dataFormatada(data)", intelligence + "function dataFormatada(data)")
 }
 
-// Real audience data for 'Mais Lidas'. Never fabricate readership.
+// Load a wider live window; the database remains the permanent archive.
+s = s.replaceAll(".order('published_at', { ascending: false, nullsFirst: false }).limit(50)", ".order('published_at', { ascending: false, nullsFirst: false }).limit(150)")
+
+// Real-audience 'Mais Lidas'.
 if (!s.includes('const [maisLidas, setMaisLidas]')) {
   s = s.replace("  const [newsletterAceita, setNewsletterAceita] = useState(true)\n", "  const [newsletterAceita, setNewsletterAceita] = useState(true)\n  const [maisLidas, setMaisLidas] = useState([])\n")
-  const effectPatch = `
+  const effect = `
   useEffect(() => {
     async function carregarMaisLidas() {
       const { data, error } = await supabase.from('article_views').select('article_id,view_count').order('view_count', { ascending: false }).limit(20)
-      if (error) { console.error('Erro ao carregar Mais Lidas:', error); return }
+      if (error) return console.error('Erro ao carregar Mais Lidas:', error)
       const byId = new Map((data || []).map(row => [String(row.article_id), Number(row.view_count || 0)]))
       const ranked = articles.filter(a => byId.has(String(a.id))).map(a => ({ ...a, view_count: byId.get(String(a.id)) || 0 })).sort((a,b) => b.view_count - a.view_count)
       setMaisLidas(ranked.slice(0, 5))
@@ -48,53 +53,29 @@ if (!s.includes('const [maisLidas, setMaisLidas]')) {
     if (articles.length) carregarMaisLidas()
   }, [articles])
 `
-  s = s.replace("  async function inscreverNewsletter(e)", effectPatch + "\n  async function inscreverNewsletter(e)")
+  s = s.replace("  async function inscreverNewsletter(e)", effect + "\n  async function inscreverNewsletter(e)")
 }
 
-// Broaden the live homepage window. The database remains the permanent archive.
-s = s.replaceAll(".order('published_at', { ascending: false, nullsFirst: false }).limit(50)", ".order('published_at', { ascending: false, nullsFirst: false }).limit(150)")
-
-s = s.replaceAll('Vetor Global • AGORA</span>', 'Vetor Global • VETOR SELECIONA</span>')
-s = s.replaceAll("${noticiasFiltradas.length} notícias em destaque", 'Cobertura em tempo real')
-
-// Make the Radar Cripto CTA a real navigation target instead of only changing the category filter.
-s = s.replace("<button className=\"ghost\" onClick={() => navegar('cripto')}>₿ Radar Cripto</button>", "<button className=\"ghost\" onClick={() => { setActive('cripto'); requestAnimationFrame(() => document.getElementById('radar-cripto')?.scrollIntoView({ behavior: 'smooth', block: 'start' })) }}>₿ Radar Cripto</button>")
-s = s.replace('<section className="vg-two"><Categoria titulo="₿ Radar Cripto"', '<section className="vg-two" id="radar-cripto"><Categoria titulo="₿ Radar Cripto"')
-
-// 24h editorial shelf life: strong recent stories remain discoverable while the lead can rotate.
+// 24h shelf life for recent stories.
 if (!s.includes('vg-shelf')) {
   s = s.replace("  const radarImpacto = selecionadas.filter(item => item?.id !== destaque?.id).slice(0, 3)\n", "  const radarImpacto = selecionadas.filter(item => item?.id !== destaque?.id).slice(0, 3)\n  const shelfCutoff = Date.now() - 24 * 3600000\n  const emDestaque = useMemo(() => rankingEditorial(noticiasFiltradas.filter(item => new Date(item?.published_at || item?.created_at || 0).getTime() >= shelfCutoff)).filter(item => item?.id !== destaque?.id).slice(0, 4), [noticiasFiltradas, destaque])\n")
   const shelf = `<section className="vg-section vg-shelf"><div className="vg-section-head"><div><span className="eyebrow">24 HORAS</span><h2>Em destaque</h2></div><span className="live">● HISTÓRIAS QUE AINDA IMPORTAM</span></div><div className="vg-grid">{emDestaque.map(article => <Article key={article.id} article={article} />)}</div></section>`
   s = s.replace('<section className="vg-section vg-impact-section">', shelf + '\n\n      <section className="vg-section vg-impact-section">')
-  const shelfCss = `.vg-shelf{border-top:1px solid #e4e7ec}.vg-shelf .vg-section-head{margin-bottom:18px}`
-  s = s.replace('const css = `', 'const css = `' + shelfCss)
 }
 
-if (!s.includes('vg-most-read')) {
-  const mostRead = `<section className="vg-section vg-most-read"><div className="vg-section-head"><div><span className="eyebrow">AUDIÊNCIA REAL</span><h2>Mais lidas</h2></div><span className="live">● ÚLTIMAS VISUALIZAÇÕES</span></div>{maisLidas.length ? <div className="vg-most-read-list">{maisLidas.map((article, index) => { const item = noticiaApresentavel(article); return <a className="vg-most-read-item" href={"/noticia/" + encodeURIComponent(item.id)} key={item.id}><span>{String(index + 1).padStart(2, '0')}</span><div><strong>{item.displayTitle}</strong><small>{item.displaySource} • {article.view_count} {article.view_count === 1 ? 'visualização' : 'visualizações'}</small></div></a> })}</div> : <div className="vg-empty">O ranking de audiência está sendo construído com visualizações reais.</div>}</section>`
-  s = s.replace('<section className="vg-section" id="mercados">', mostRead + '\n\n      <section className="vg-section" id="mercados">')
-  const cssPatch = `.vg-most-read-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}.vg-most-read-item{display:flex;gap:10px;min-width:0;padding:15px;text-decoration:none;background:#fff;border:1px solid #e4e7ec;border-radius:12px;color:#101828}.vg-most-read-item>span{font-size:24px;font-weight:900;color:#d4a72c;line-height:1}.vg-most-read-item strong{display:block;font-family:Georgia,"Times New Roman",serif;font-size:16px;line-height:1.18}.vg-most-read-item small{display:block;color:#667085;font-size:10px;margin-top:9px}.vg-most-read-item:hover{border-color:#b2ccff;transform:translateY(-1px)}@media(max-width:900px){.vg-most-read-list{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:600px){.vg-most-read-list{grid-template-columns:1fr}.vg-most-read-item{padding:14px}.vg-most-read-item strong{font-size:18px}.vg-most-read-item small{font-size:12px}}`
-  s = s.replace('const css = `', 'const css = `' + cssPatch)
-}
+// Improve Radar Cripto navigation.
+s = s.replace("<button className=\"ghost\" onClick={() => navegar('cripto')}>₿ Radar Cripto</button>", "<button className=\"ghost\" onClick={() => { setActive('cripto'); requestAnimationFrame(() => document.getElementById('radar-cripto')?.scrollIntoView({ behavior: 'smooth', block: 'start' })) }}>₿ Radar Cripto</button>")
+s = s.replace('<section className="vg-two"><Categoria titulo="₿ Radar Cripto"', '<section className="vg-two" id="radar-cripto"><Categoria titulo="₿ Radar Cripto"')
 
-// Polish the AGORA rail on mobile: make the status label proportionate to the headline beside it.
+// AGORA hierarchy: compact status label, stronger live headline, no loose right-side text.
 if (!s.includes('vg-agora-polish')) {
-  const agoraCss = `.vg-agora-polish{display:inline-flex;align-items:center;gap:7px}.vg-agora-polish .agora-dot{font-size:15px;line-height:1}.vg-agora-polish .agora-label{font-size:19px;font-weight:800;letter-spacing:.2px}.vg-agora-polish .agora-copy{font-size:24px;font-weight:800;letter-spacing:-.3px}@media(max-width:600px){.vg-agora-polish{gap:7px}.vg-agora-polish .agora-label{font-size:18px}.vg-agora-polish .agora-copy{font-size:24px}.vg-agora-polish + *{margin-top:22px!important}}`
-  s = s.replace('const css = `', 'const css = `' + agoraCss)
-  s = s.replace('<span>● AGORA</span><strong>{loading ? \'Atualizando o portal…\' : \'Cobertura em tempo real\'}</strong>', '<div className="vg-agora-polish"><span className="agora-dot">●</span><span className="agora-label">AGORA</span><span className="agora-copy">{loading ? \'Atualizando o portal…\' : \'Cobertura em tempo real\'}</span></div>')
+  s = s.replace('<span>● AGORA</span><strong>{loading ? \'Atualizando o portal…\' : \'Cobertura em tempo real\'}</strong><small>Informação, contexto e impacto.</small>', '<div className="vg-agora-polish"><span className="agora-dot">●</span><span className="agora-label">AGORA</span><span className="agora-sep">·</span><strong className="agora-copy">{loading ? \'Atualizando o portal…\' : \'Cobertura em tempo real\'}</strong></div>')
 }
 
-// VETOR PRO responsive composition: generous safe area, natural wrapping and a full-width mobile CTA.
-if (!s.includes('vg-pro-safe')) {
-  const proCss = `.vg-pro-safe{padding:clamp(30px,4vw,48px);border-radius:20px;overflow:hidden}.vg-pro-safe .vg-pro-copy{min-width:0;max-width:900px}.vg-pro-safe h2{max-width:780px;line-height:1.05;overflow-wrap:anywhere}.vg-pro-safe p{max-width:820px}.vg-pro-safe .vg-pro-cta{flex:0 0 auto;white-space:nowrap}@media(max-width:760px){.vg-pro-safe{padding:28px 22px;display:block}.vg-pro-safe .vg-pro-copy{width:100%}.vg-pro-safe h2{font-size:clamp(30px,8vw,38px);line-height:1.08;margin:10px 0 14px}.vg-pro-safe p{font-size:17px;line-height:1.55}.vg-pro-safe .vg-pro-cta{width:100%;margin-top:20px;padding:15px 16px;font-size:16px}}@media(max-width:480px){.vg-pro-safe{padding:26px 20px}.vg-pro-safe h2{font-size:30px;line-height:1.1}.vg-pro-safe p{font-size:17px}}`
-  s = s.replace('const css = `', 'const css = `' + proCss)
-  s = s.replace('<section className="vg-pro"><div><span className="eyebrow">VETOR PRO • EM DESENVOLVIMENTO</span><h2>Mais contexto. Menos ruído.</h2><p>Análises, cenários e leitura de impacto para quem quer entender o que está por trás da notícia.</p></div><button onClick={() => document.getElementById(\'newsletter\')?.scrollIntoView({ behavior: \'smooth\' })}>Quero acompanhar →</button></section>', '<section className="vg-pro vg-pro-safe"><div className="vg-pro-copy"><span className="eyebrow">VETOR PRO • EM DESENVOLVIMENTO</span><h2>Mais contexto. Menos ruído.</h2><p>Análises, cenários e leitura de impacto para quem quer entender o que está por trás da notícia.</p></div><button className="vg-pro-cta" onClick={() => document.getElementById(\'newsletter\')?.scrollIntoView({ behavior: \'smooth\' })}>Quero acompanhar →</button></section>')
-}
+// Inject CSS only at the known CSS template opening; never replace arbitrary backticks.
+const extraCss = `.vg-shelf{border-top:1px solid #e4e7ec}.vg-shelf .vg-section-head{margin-bottom:18px}.vg-agora-polish{display:flex;align-items:baseline;gap:7px;width:100%;min-width:0}.vg-agora-polish .agora-dot{color:#d92d20;font-size:11px;line-height:1;flex:0 0 auto}.vg-agora-polish .agora-label{color:#d92d20;font-size:16px;font-weight:850;letter-spacing:.2px;flex:0 0 auto}.vg-agora-polish .agora-sep{color:#98a2b3;font-size:18px;font-weight:700;flex:0 0 auto}.vg-agora-polish .agora-copy{color:#101828;font-size:20px;font-weight:800;line-height:1.15;min-width:0;overflow-wrap:anywhere}.vg-pro{position:relative;box-sizing:border-box;width:100%;max-width:100%;min-width:0;overflow:hidden;padding:32px clamp(20px,4vw,48px)}.vg-pro>div{min-width:0;max-width:100%;overflow:hidden}.vg-pro h2{max-width:100%;margin:10px 0 16px;line-height:1.08;letter-spacing:-.7px;overflow-wrap:break-word;word-break:normal}.vg-pro p{max-width:100%;margin:0;overflow-wrap:break-word;word-break:normal}.vg-pro button{box-sizing:border-box;max-width:100%;white-space:nowrap}@media(max-width:760px){.vg-agora{padding:8px 0}.vg-agora-polish{gap:6px}.vg-agora-polish .agora-dot{font-size:9px}.vg-agora-polish .agora-label{font-size:15px}.vg-agora-polish .agora-sep{font-size:16px}.vg-agora-polish .agora-copy{font-size:20px}.vg-pro{padding:28px 22px!important}.vg-pro h2{font-size:clamp(30px,8vw,38px)!important;line-height:1.08!important}.vg-pro p{font-size:17px!important;line-height:1.55!important}.vg-pro button{width:100%;margin-top:20px;padding:15px 16px!important;font-size:16px!important}}@media(max-width:480px){.vg-agora-polish{gap:5px}.vg-agora-polish .agora-label{font-size:14px}.vg-agora-polish .agora-copy{font-size:19px}.vg-pro{padding:26px 20px!important}.vg-pro h2{font-size:30px!important;line-height:1.1!important;margin:10px 0 14px!important}.vg-pro p{font-size:17px!important}}@media(max-width:360px){.vg-agora-polish .agora-label{font-size:13px}.vg-agora-polish .agora-copy{font-size:18px}.vg-pro{padding:24px 18px!important}.vg-pro h2{font-size:29px!important}}`
+s = s.replace('const css = `', 'const css = `' + extraCss)
 
-// Final hardening: the live App still uses the original vg-pro markup in production, so apply the safe composition directly to that class too.
-const proSafety = `.vg-pro{position:relative;box-sizing:border-box;width:100%;max-width:100%;min-width:0;overflow:hidden;padding:32px clamp(20px,4vw,48px);border-radius:20px}.vg-pro>div{min-width:0;max-width:100%;overflow:hidden}.vg-pro h2{max-width:100%;margin:10px 0 16px;line-height:1.08;overflow-wrap:break-word;word-break:normal}.vg-pro p{max-width:100%;margin:0;overflow-wrap:break-word}.vg-pro button{box-sizing:border-box;max-width:100%;white-space:nowrap}@media(max-width:760px){.vg-pro{padding:28px 22px!important}.vg-pro h2{font-size:clamp(30px,8vw,38px)!important;line-height:1.08!important;letter-spacing:-.7px!important}.vg-pro p{font-size:17px!important;line-height:1.55!important}.vg-pro button{width:100%;margin-top:20px;padding:15px 16px!important;font-size:16px!important}}@media(max-width:480px){.vg-pro{padding:26px 20px!important}.vg-pro h2{font-size:30px!important;line-height:1.1!important;margin:10px 0 14px!important}.vg-pro p{font-size:17px!important}}`
-const cssEnd = '`'
-s = s.replace(cssEnd, proSafety + cssEnd)
-
+// Preserve the existing responsive typography approved for the project.
 fs.writeFileSync(path, s)
-console.log('Brand, editorial, shelf life, audience ranking, AGORA hierarchy and VETOR PRO safety patches applied')
+console.log('Vetor Global build patch applied: editorial intelligence, 150-story window, 24h shelf, real audience, AGORA hierarchy and VETOR PRO safe responsive layout')
