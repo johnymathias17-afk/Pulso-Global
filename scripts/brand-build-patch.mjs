@@ -22,9 +22,12 @@ const scoreEditorial = article => {
   const image = article?.image_url ? 9 : 0
   const summaryScore = summary.length >= 80 ? 12 : summary.length >= 40 ? 7 : 0
   const titleScore = title.length >= 35 && title.length <= 120 ? 8 : title.length > 20 ? 4 : 0
-  const trusted = /(reuters|bbc|cnn brasil|cnn|uol|folha|valor|estadao|estadão|g1|agencia brasil|bloomberg|financial times|money times|portal do bitcoin)/i.test(source) ? 9 : 4
-  const impact = /(fed|fomc|juros|inflacao|ipca|cpi|dolar|ibovespa|bitcoin|ethereum|cripto|guerra|petroleo|petróleo|stf|governo|congresso|eleicao|eleição|tarifa|china|eua|ia|inteligencia artificial|tecnologia)/i.test(title + ' ' + summary) ? 8 : 0
-  return freshness + image + summaryScore + titleScore + trusted + impact
+  const trusted = /(reuters|bbc|cnn brasil|cnn|uol|folha|valor|estadao|estadão|g1|agencia brasil|bloomberg|financial times|money times|portal do bitcoin|vista patria|dallagnol)/i.test(source) ? 9 : 4
+  const impact = /(fed|fomc|juros|inflacao|ipca|cpi|dolar|ibovespa|bitcoin|ethereum|cripto|guerra|petroleo|petróleo|stf|supremo|moraes|trump|magnitsky|ministro|ministros|governo|congresso|eleicao|eleição|tarifa|china|eua|ia|inteligencia artificial|tecnologia|sanção|sancao|crise|decisão|decisao)/i.test(title + ' ' + summary) ? 8 : 0
+  // Engagement signal: power, conflict, sanctions and decisions usually outperform generic ranking/list stories.
+  const engagement = /(trump|moraes|stf|supremo|magnitsky|sanções|sancoes|ministro|ministros|crise|guerra|prisão|prisao|confronto|afastamento|investigação|investigacao|vaza|escândalo|escandalo|decisão|decisao|sanção|sancao|tarifa|ameaça|ameaca|urgente)/i.test(title + ' ' + summary) ? 18 : 0
+  const lowEngagement = /(mais procurad|mais buscad|segundo investimento|aves|fauna|horóscopo|horoscopo|previsão do tempo|previsao do tempo)/i.test(title) ? -16 : 0
+  return freshness + image + summaryScore + titleScore + trusted + impact + engagement + lowEngagement
 }
 const selecionarDestaque = items => [...items].sort((a, b) => { const diff = scoreEditorial(b) - scoreEditorial(a); if (diff) return diff; return new Date(b?.published_at || b?.created_at || 0) - new Date(a?.published_at || a?.created_at || 0) })
 `
@@ -40,7 +43,7 @@ if (!s.includes('const [maisLidas, setMaisLidas]')) {
       const { data, error } = await supabase.from('article_views').select('article_id,view_count').order('view_count', { ascending: false }).limit(20)
       if (error) { console.error('Erro ao carregar Mais Lidas:', error); return }
       const byId = new Map((data || []).map(row => [String(row.article_id), Number(row.view_count || 0)]))
-      const ranked = articles.filter(a => byId.has(String(a.id))).map(a => ({ ...a, view_count: byId.get(String(a.id)) || 0 })).sort((a, b) => b.view_count - a.view_count)
+      const ranked = articles.filter(a => byId.has(String(a.id))).map(a => ({ ...a, view_count: byId.get(String(a.id)) || 0 })).sort((a,b) => b.view_count - a.view_count)
       setMaisLidas(ranked.slice(0, 5))
     }
     if (articles.length) carregarMaisLidas()
@@ -51,6 +54,10 @@ if (!s.includes('const [maisLidas, setMaisLidas]')) {
 
 s = s.replaceAll('Vetor Global • AGORA</span>', 'Vetor Global • VETOR SELECIONA</span>')
 s = s.replaceAll("${noticiasFiltradas.length} notícias em destaque", 'Cobertura em tempo real')
+
+// Make the Radar Cripto CTA a real navigation target instead of only changing the category filter.
+s = s.replace("<button className=\"ghost\" onClick={() => navegar('cripto')}>₿ Radar Cripto</button>", "<button className=\"ghost\" onClick={() => { setActive('cripto'); requestAnimationFrame(() => document.getElementById('radar-cripto')?.scrollIntoView({ behavior: 'smooth', block: 'start' })) }}>₿ Radar Cripto</button>")
+s = s.replace('<section className="vg-two"><Categoria titulo="₿ Radar Cripto"', '<section className="vg-two" id="radar-cripto"><Categoria titulo="₿ Radar Cripto"')
 
 if (!s.includes('vg-most-read')) {
   const mostRead = `<section className="vg-section vg-most-read"><div className="vg-section-head"><div><span className="eyebrow">AUDIÊNCIA REAL</span><h2>Mais lidas</h2></div><span className="live">● ÚLTIMAS VISUALIZAÇÕES</span></div>{maisLidas.length ? <div className="vg-most-read-list">{maisLidas.map((article, index) => { const item = noticiaApresentavel(article); return <a className="vg-most-read-item" href={"/noticia/" + encodeURIComponent(item.id)} key={item.id}><span>{String(index + 1).padStart(2, '0')}</span><div><strong>{item.displayTitle}</strong><small>{item.displaySource} • {article.view_count} {article.view_count === 1 ? 'visualização' : 'visualizações'}</small></div></a> })}</div> : <div className="vg-empty">O ranking de audiência está sendo construído com visualizações reais.</div>}</section>`
