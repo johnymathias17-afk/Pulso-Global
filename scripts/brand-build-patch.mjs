@@ -58,9 +58,12 @@ if (!s.includes('const [maisLidas, setMaisLidas]')) {
 
 // 24h shelf life for recent stories.
 if (!s.includes('vg-shelf')) {
-  s = s.replace("  const radarImpacto = selecionadas.filter(item => item?.id !== destaque?.id).slice(0, 3)\n", "  const radarImpacto = selecionadas.filter(item => item?.id !== destaque?.id).slice(0, 3)\n  const shelfCutoff = Date.now() - 24 * 3600000\n  const emDestaque = useMemo(() => rankingEditorial(noticiasFiltradas.filter(item => new Date(item?.published_at || item?.created_at || 0).getTime() >= shelfCutoff)).filter(item => item?.id !== destaque?.id).slice(0, 4), [noticiasFiltradas, destaque])\n")
+  s = s.replace("  const radarImpacto = selecionadas.filter(item => item?.id !== destaque?.id).slice(0, 3)\n", "  const shelfCutoff = Date.now() - 24 * 3600000\n  const emDestaque = rankingEditorial(noticiasFiltradas.filter(item => new Date(item?.published_at || item?.created_at || 0).getTime() >= shelfCutoff)).filter(item => item?.id !== destaque?.id).slice(0, 4)\n  const emDestaqueIds = new Set(emDestaque.map(item => item?.id))\n  const radarImpacto = selecionadas.filter(item => item?.id !== destaque?.id && !emDestaqueIds.has(item?.id)).slice(0, 3)\n")
   const shelf = `<section className="vg-section vg-shelf"><div className="vg-section-head"><div><span className="eyebrow">24 HORAS</span><h2>Em destaque</h2></div><span className="live">● HISTÓRIAS QUE AINDA IMPORTAM</span></div><div className="vg-grid">{emDestaque.map(article => <Article key={article.id} article={article} />)}</div></section>`
   s = s.replace('<section className="vg-section vg-impact-section">', shelf + '\n\n      <section className="vg-section vg-impact-section">')
+} else {
+  // Even when the shelf already exists in the source, enforce separation from Radar.
+  s = s.replace("const radarImpacto = selecionadas.filter(item => item?.id !== destaque?.id).slice(0, 3)", "const emDestaqueIds = new Set((typeof emDestaque !== 'undefined' ? emDestaque : []).map(item => item?.id))\n  const radarImpacto = selecionadas.filter(item => item?.id !== destaque?.id && !emDestaqueIds.has(item?.id)).slice(0, 3)")
 }
 
 // Improve Radar Cripto navigation.
