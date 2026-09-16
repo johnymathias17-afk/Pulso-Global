@@ -1,0 +1,80 @@
+/* Vetor Global — layout editorial aprovado (desktop, mobile e e-mail-safe visual language) */
+:root {
+  --vg-editorial-navy: #061b33;
+  --vg-editorial-blue: #155eef;
+  --vg-editorial-green: #087443;
+  --vg-editorial-paper: #f8fafc;
+}
+
+.vg-site {
+  background: var(--vg-editorial-paper) !important;
+  color: #0b1220 !important;
+}
+
+.vg-header {
+  background: var(--vg-editorial-navy) !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-radius: 0 0 16px 16px !important;
+  min-height: 94px !important;
+  padding: 14px clamp(18px, 4vw, 56px) !important;
+}
+
+.vg-brand { color: #fff !important; }
+.vg-brand strong { font-size: clamp(20px, 2.6vw, 30px) !important; letter-spacing: -.04em !important; }
+.vg-brand small { color: #d8e4f0 !important; letter-spacing: .12em !important; text-transform: uppercase !important; }
+.vg-logo { border: 1px solid rgba(255,255,255,.9) !important; }
+
+.vg-menu {
+  background: #fff !important;
+  border-bottom: 1px solid #e4e7ec !important;
+  padding: 10px clamp(18px, 4vw, 56px) !important;
+}
+.vg-menu button { color: #344054 !important; }
+.vg-menu button.ativo { background: var(--vg-editorial-navy) !important; color: #fff !important; }
+
+.vg-main { max-width: 1280px !important; margin: 0 auto !important; padding: 0 clamp(14px, 3vw, 38px) !important; }
+.vg-agora { border: 0 !important; border-radius: 0 !important; background: transparent !important; padding: 24px 0 12px !important; }
+.vg-agora span, .live { color: var(--vg-editorial-green) !important; font-weight: 800 !important; }
+
+.vg-hero {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, .95fr) !important;
+  gap: 28px !important;
+  align-items: stretch !important;
+  padding: 28px 0 38px !important;
+}
+.vg-hero-copy { padding: 12px 0 !important; }
+.vg-hero-copy h1 { font-family: Georgia, 'Times New Roman', serif !important; font-size: clamp(38px, 4.4vw, 64px) !important; line-height: 1.01 !important; letter-spacing: -.055em !important; }
+.vg-hero-copy p { max-width: 640px !important; font-size: 17px !important; line-height: 1.6 !important; }
+.vg-hero > article, .vg-hero > div:last-child { border-radius: 16px !important; border: 1px solid #dfe5ed !important; background: #fff !important; overflow: hidden !important; box-shadow: 0 12px 30px rgba(16,24,40,.06) !important; }
+
+.vg-section { padding: 30px 0 42px !important; }
+.vg-section-head { border-bottom: 1px solid #dfe5ed !important; padding-bottom: 14px !important; margin-bottom: 18px !important; }
+.vg-section-head h2 { font-family: Georgia, 'Times New Roman', serif !important; font-size: clamp(28px, 3vw, 42px) !important; letter-spacing: -.04em !important; }
+.vg-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 18px !important; }
+.vg-grid article, .vg-impact-grid article { background: #fff !important; border: 1px solid #dfe5ed !important; border-radius: 12px !important; box-shadow: 0 5px 18px rgba(16,24,40,.04) !important; overflow: hidden !important; }
+.vg-grid article:hover, .vg-impact-grid article:hover { transform: translateY(-2px); box-shadow: 0 12px 26px rgba(16,24,40,.09) !important; }
+.vg-grid article h3, .vg-impact-grid article h3 { font-family: Georgia, 'Times New Roman', serif !important; color: #0b1220 !important; letter-spacing: -.025em !important; }
+.vg-grid article p, .vg-impact-grid article p { color: #475467 !important; line-height: 1.5 !important; }
+
+.vg-impact-grid { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 18px !important; }
+.vg-impact { padding: 22px !important; }
+.impact-tag { color: var(--vg-editorial-blue) !important; background: #eef4ff !important; border-radius: 5px !important; padding: 5px 8px !important; font-weight: 800 !important; }
+
+@media (max-width: 900px) {
+  .vg-hero { grid-template-columns: 1fr !important; }
+  .vg-grid, .vg-impact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 600px) {
+  .vg-header { min-height: 76px !important; padding: 10px 14px !important; }
+  .vg-brand strong { font-size: 19px !important; }
+  .vg-brand small { font-size: 9px !important; letter-spacing: .06em !important; }
+  .vg-main { padding: 0 14px !important; }
+  .vg-hero { gap: 16px !important; padding-top: 14px !important; }
+  .vg-hero-copy h1 { font-size: clamp(34px, 10vw, 46px) !important; }
+  .vg-hero-copy p { font-size: 15px !important; }
+  .vg-grid, .vg-impact-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+  .vg-section { padding: 22px 0 28px !important; }
+  .vg-section-head h2 { font-size: 29px !important; }
+}
