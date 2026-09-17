@@ -1,0 +1,38 @@
+/* Correção de contraste dos blocos escuros — Vetor Global */
+.vg-pro h2,
+.vg-pro p,
+.vg-pro .eyebrow,
+.vg-newsletter h2,
+.vg-newsletter p,
+.vg-newsletter .eyebrow,
+.vg-newsletter label,
+.vg-newsletter label span,
+.vg-newsletter label strong {
+  color: #ffffff !important;
+}
+
+.vg-pro h2,
+.vg-newsletter h2 {
+  text-shadow: none !important;
+}
+
+.vg-pro p,
+.vg-newsletter p {
+  color: #d7deea !important;
+}
+
+.vg-newsletter input::placeholder {
+  color: #667085 !important;
+  opacity: 1 !important;
+}
+
+.vg-newsletter .status {
+  color: #ffffff !important;
+}
+
+@media (max-width: 600px) {
+  .vg-pro h2,
+  .vg-newsletter h2 {
+    line-height: 1.12 !important;
+  }
+}
