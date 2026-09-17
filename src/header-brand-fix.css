@@ -1,0 +1,22 @@
+/* Vetor Global — correção de cabeçalho e assinatura da marca */
+.vg-header{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important;min-width:0!important;}
+.vg-brand{display:flex!important;align-items:center!important;gap:12px!important;flex:1 1 auto!important;min-width:0!important;overflow:visible!important;}
+.vg-brand>span:last-child{display:flex!important;flex-direction:column!important;min-width:0!important;flex:1 1 auto!important;overflow:visible!important;}
+.vg-brand strong{display:block!important;white-space:nowrap!important;overflow:visible!important;}
+.vg-brand small{display:block!important;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;max-width:none!important;line-height:1.25!important;overflow-wrap:normal!important;}
+.vg-now{flex:0 0 auto!important;white-space:nowrap!important;}
+@media(max-width:760px){
+  .vg-header{gap:8px!important;padding-left:12px!important;padding-right:12px!important;}
+  .vg-brand{gap:9px!important;}
+  .vg-brand small{font-size:clamp(7px,1.9vw,9px)!important;letter-spacing:.025em!important;}
+  .vg-now{padding:9px 11px!important;font-size:10px!important;}
+}
+@media(max-width:420px){
+  .vg-brand strong{font-size:18px!important;letter-spacing:-.035em!important;}
+  .vg-brand small{font-size:8px!important;letter-spacing:0!important;max-width:190px!important;}
+  .vg-now{font-size:9px!important;padding:9px 8px!important;}
+}
+@media(max-width:360px){
+  .vg-brand small{font-size:7.5px!important;max-width:165px!important;}
+  .vg-now{font-size:8px!important;padding:8px 7px!important;}
+}
