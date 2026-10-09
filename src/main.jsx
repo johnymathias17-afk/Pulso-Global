@@ -1,5 +1,6 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
+import App from './App'
 import './styles.css'
 import './premium.css'
 import './editorial.css'
@@ -42,41 +43,22 @@ class StartupBoundary extends React.Component {
   }
 }
 
-const rootElement = document.getElementById('root')
-const root = createRoot(rootElement)
+createRoot(document.getElementById('root')).render(
+  <StartupBoundary><App /></StartupBoundary>
+)
 
-function showStartupError() {
-  root.render(
-    <main style={{ maxWidth: 680, margin: '48px auto', padding: '24px', fontFamily: 'Arial, sans-serif', color: '#0b1220', lineHeight: 1.6 }}>
-      <h1 style={{ fontSize: 28 }}>Vetor Global</h1>
-      <p>Não foi possível iniciar o portal neste momento.</p>
-      <p>Verifique sua conexão e tente novamente.</p>
-      <button onClick={() => window.location.reload()} style={{ padding: '12px 18px', border: 0, borderRadius: 10, background: '#0b1220', color: '#fff', fontWeight: 700, cursor: 'pointer' }}>
-        Tentar novamente
-      </button>
-    </main>
-  )
-}
-
-// Start the core page independently from optional enhancement scripts.
-// A failure in SEO/editorial/analytics enhancements must not prevent the portal from opening.
-import('./App')
-  .then(({ default: App }) => {
-    root.render(
-      <StartupBoundary>
-        <App />
-      </StartupBoundary>
-    )
-    return Promise.allSettled([
-      import('./pro-teaser.js'),
-      import('./seo-enhancer.js'),
-      import('./editorial-enhancer.js'),
-      import('./editorial-priority.js'),
-      import('./editorial-engine.js'),
-      import('./analytics-enhancer.js'),
-    ])
+// Load optional enhancements separately so they cannot block the main portal.
+Promise.allSettled([
+  import('./pro-teaser.js'),
+  import('./seo-enhancer.js'),
+  import('./editorial-enhancer.js'),
+  import('./editorial-priority.js'),
+  import('./editorial-engine.js'),
+  import('./analytics-enhancer.js'),
+]).then(results => {
+  results.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      console.error('Recurso opcional do Vetor Global indisponível:', index, result.reason)
+    }
   })
-  .catch(error => {
-    console.error('Falha ao iniciar o Vetor Global:', error)
-    showStartupError()
-  })
+})
