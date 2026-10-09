@@ -150,7 +150,7 @@ export default function App() {
       setCotacoes(Object.fromEntries((data?.quotes ?? []).filter(q => q.price != null).map(q => [q.symbol, q])))
     }
     carregarCotacoes()
-    const timer = setInterval(carregarCotacoes, 60000)
+    const timer = setInterval(carregarCotacoes, 300000)
     return () => clearInterval(timer)
   }, [])
 
