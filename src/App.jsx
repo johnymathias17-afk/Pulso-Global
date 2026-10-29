@@ -209,7 +209,7 @@ export default function App() {
       <section className="vg-agora" id="agora"><span>● AGORA</span><strong>{loading ? 'Atualizando o portal…' : 'Cobertura em tempo real'}</strong><small>Informação, contexto e impacto.</small></section>
 
       <section className="vg-hero">
-        <div className="vg-hero-copy"><span className="eyebrow">Vetor Global • VETOR SELECIONA</span><h1>O que está acontecendo no mundo — e por que isso importa?</h1><p>Notícias relevantes do Brasil e do mundo, com foco nos acontecimentos que podem impactar mercados, economia, tecnologia e criptoativos.</p><div className="vg-actions"><button onClick={() => document.getElementById('ultimas')?.scrollIntoView({ behavior: 'smooth' })}>Ver últimas notícias →</button><button className="ghost" onClick={() => navegar('cripto')}>₿ Radar Cripto</button></div></div>
+        <div className="vg-hero-copy"><span className="eyebrow">Vetor Global • VETOR SELECIONA</span><h1>O que está acontecendo no mundo — e por que isso importa?</h1><p>Notícias relevantes do Brasil e do mundo, com foco nos acontecimentos que podem impactar mercados, economia, tecnologia e criptoativos.</p><div className="vg-actions"><button onClick={() => document.getElementById('ultimas')?.scrollIntoView({ behavior: 'smooth' })}>Ver últimas notícias →</button><button className="ghost" onClick={() => navegar('cripto')}>₿ Radar Cripto</button><button className="ghost" onClick={() => { window.location.href = '/radar-btc' }}>₿ Radar BTC ao vivo ↗</button></div></div>
         {destaque ? <Article article={destaque} destaque /> : <div className="vg-lead-empty">Carregando as principais notícias…</div>}
       </section>
 
