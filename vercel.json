@@ -6,6 +6,7 @@
     { "source": "/noticia/:id", "destination": "/api/noticia-premium?id=:id" },
     { "source": "/metodologia", "destination": "/metodologia.html" },
     { "source": "/redacao", "destination": "/redacao.html" },
+    { "source": "/radar-btc", "destination": "/radar-btc.html" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
